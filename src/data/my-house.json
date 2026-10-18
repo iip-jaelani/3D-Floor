@@ -1,0 +1,2077 @@
+{
+  "name": "Rumah Saya",
+  "wallHeight": 2.8,
+  "wallThickness": 0.12,
+  "wallColor": "#e5e0d8",
+  "floors": [
+    {
+      "id": "floor-1",
+      "name": "Lantai 1",
+      "level": 0,
+      "walls": [
+        {
+          "id": "wall-2",
+          "a": [
+            -2.5,
+            -1.1
+          ],
+          "b": [
+            0.5,
+            -1.1
+          ]
+        },
+        {
+          "id": "wall-3",
+          "a": [
+            0.5,
+            -1.1
+          ],
+          "b": [
+            0.5,
+            1.4
+          ]
+        },
+        {
+          "id": "wall-4",
+          "a": [
+            0.5,
+            1.4
+          ],
+          "b": [
+            -2.5,
+            1.4
+          ]
+        },
+        {
+          "id": "wall-5",
+          "a": [
+            -2.5,
+            1.4
+          ],
+          "b": [
+            -2.5,
+            -1.1
+          ]
+        },
+        {
+          "id": "wall-8",
+          "a": [
+            0.5,
+            3.9
+          ],
+          "b": [
+            -2.5,
+            3.9
+          ]
+        },
+        {
+          "id": "wall-9",
+          "a": [
+            -2.5,
+            3.9
+          ],
+          "b": [
+            -2.5,
+            1.4
+          ]
+        },
+        {
+          "id": "wall-13",
+          "a": [
+            0.5,
+            0.4
+          ],
+          "b": [
+            2.5,
+            0.4
+          ]
+        },
+        {
+          "id": "wall-14",
+          "a": [
+            2.5,
+            0.4
+          ],
+          "b": [
+            2.5,
+            0.9
+          ]
+        },
+        {
+          "id": "wall-19",
+          "a": [
+            6.5,
+            0.9
+          ],
+          "b": [
+            6.5,
+            3.9
+          ]
+        },
+        {
+          "id": "wall-21",
+          "a": [
+            6.5,
+            3.9
+          ],
+          "b": [
+            6.5,
+            6.4
+          ]
+        },
+        {
+          "id": "wall-41",
+          "a": [
+            0.5,
+            3.9
+          ],
+          "b": [
+            1.5,
+            3.9
+          ]
+        },
+        {
+          "id": "wall-42",
+          "a": [
+            6.5,
+            3.9
+          ],
+          "b": [
+            3.9000000000000004,
+            3.9000000000000004
+          ]
+        },
+        {
+          "id": "wall-49",
+          "a": [
+            1.5,
+            6.4
+          ],
+          "b": [
+            2.5,
+            6.4
+          ]
+        },
+        {
+          "id": "wall-52",
+          "a": [
+            1.5,
+            6.4
+          ],
+          "b": [
+            1.5,
+            10.4
+          ]
+        },
+        {
+          "id": "wall-63",
+          "a": [
+            -7.5,
+            6.4
+          ],
+          "b": [
+            -7.5,
+            10.4
+          ]
+        },
+        {
+          "id": "wall-65",
+          "a": [
+            -1.5,
+            10.4
+          ],
+          "b": [
+            -1.5,
+            9.4
+          ]
+        },
+        {
+          "id": "wall-66",
+          "a": [
+            -1.5,
+            9.4
+          ],
+          "b": [
+            -4.5,
+            9.4
+          ]
+        },
+        {
+          "id": "wall-67",
+          "a": [
+            -4.5,
+            9.4
+          ],
+          "b": [
+            -4.5,
+            10.4
+          ]
+        },
+        {
+          "id": "wall-68",
+          "a": [
+            -7.5,
+            10.4
+          ],
+          "b": [
+            -4.5,
+            10.4
+          ]
+        },
+        {
+          "id": "wall-69",
+          "a": [
+            -1.5,
+            10.4
+          ],
+          "b": [
+            1.5,
+            10.4
+          ]
+        },
+        {
+          "id": "wall-72",
+          "a": [
+            -4.5,
+            7.9
+          ],
+          "b": [
+            -4.5,
+            9.4
+          ]
+        },
+        {
+          "id": "wall-77",
+          "a": [
+            1.5,
+            10.4
+          ],
+          "b": [
+            4,
+            10.4
+          ]
+        },
+        {
+          "id": "wall-78",
+          "a": [
+            4,
+            10.4
+          ],
+          "b": [
+            6.5,
+            6.4
+          ]
+        },
+        {
+          "id": "wall-79",
+          "a": [
+            4,
+            6.4
+          ],
+          "b": [
+            4,
+            10.4
+          ]
+        },
+        {
+          "id": "wall-112",
+          "a": [
+            -5.5,
+            7.9
+          ],
+          "b": [
+            -5.5,
+            6.4
+          ]
+        },
+        {
+          "id": "wall-115",
+          "a": [
+            -5,
+            7.9
+          ],
+          "b": [
+            -4.5,
+            7.9
+          ]
+        },
+        {
+          "id": "wall-116",
+          "a": [
+            -7.5,
+            7.9
+          ],
+          "b": [
+            -5,
+            7.9
+          ]
+        },
+        {
+          "id": "wall-167",
+          "a": [
+            -7,
+            -1.1
+          ],
+          "b": [
+            -7,
+            2.9
+          ]
+        },
+        {
+          "id": "wall-189",
+          "a": [
+            -7.5,
+            10.4
+          ],
+          "b": [
+            -10,
+            10.4
+          ]
+        },
+        {
+          "id": "wall-207",
+          "a": [
+            -2.5,
+            3.9
+          ],
+          "b": [
+            -2.5,
+            6.4
+          ]
+        },
+        {
+          "id": "wall-208",
+          "a": [
+            -2.5,
+            6.4
+          ],
+          "b": [
+            -1,
+            6.4
+          ]
+        },
+        {
+          "id": "wall-209",
+          "a": [
+            -1,
+            6.4
+          ],
+          "b": [
+            -1,
+            3.9
+          ]
+        },
+        {
+          "id": "wall-215",
+          "a": [
+            -2.5,
+            -0.6
+          ],
+          "b": [
+            -4.5,
+            -0.6
+          ]
+        },
+        {
+          "id": "wall-217",
+          "a": [
+            -9,
+            2.9
+          ],
+          "b": [
+            -9,
+            6.4
+          ]
+        },
+        {
+          "id": "wall-225",
+          "a": [
+            -4.5,
+            6.4
+          ],
+          "b": [
+            -4.5,
+            4.9
+          ]
+        },
+        {
+          "id": "wall-243",
+          "a": [
+            -9.5,
+            -0.1
+          ],
+          "b": [
+            -8,
+            -0.1
+          ]
+        },
+        {
+          "id": "wall-244",
+          "a": [
+            -8,
+            -0.1
+          ],
+          "b": [
+            -8,
+            -1.1
+          ]
+        },
+        {
+          "id": "wall-245",
+          "a": [
+            -4.5,
+            -0.1
+          ],
+          "b": [
+            -6,
+            -0.1
+          ]
+        },
+        {
+          "id": "wall-246",
+          "a": [
+            -6,
+            -0.1
+          ],
+          "b": [
+            -6,
+            -1.1
+          ]
+        },
+        {
+          "id": "wall-258",
+          "a": [
+            -10,
+            6.4
+          ],
+          "b": [
+            -10,
+            10.4
+          ]
+        },
+        {
+          "id": "wall-269",
+          "a": [
+            3.9,
+            0.9
+          ],
+          "b": [
+            3.9000000000000004,
+            3.9000000000000004
+          ]
+        },
+        {
+          "id": "wall-271",
+          "a": [
+            -9.5,
+            -0.1
+          ],
+          "b": [
+            -9.5,
+            2.9
+          ]
+        },
+        {
+          "id": "wall-272",
+          "a": [
+            -9.5,
+            -1.1
+          ],
+          "b": [
+            -9.5,
+            -0.1
+          ]
+        },
+        {
+          "id": "wall-291",
+          "a": [
+            -7,
+            -1.1
+          ],
+          "b": [
+            -6,
+            -1.1
+          ]
+        },
+        {
+          "id": "wall-292",
+          "a": [
+            -6,
+            -1.1
+          ],
+          "b": [
+            -4.5,
+            -1.1
+          ]
+        },
+        {
+          "id": "wall-294",
+          "a": [
+            -7,
+            -1.1
+          ],
+          "b": [
+            -8,
+            -1.1
+          ]
+        },
+        {
+          "id": "wall-295",
+          "a": [
+            -8,
+            -1.1
+          ],
+          "b": [
+            -9.5,
+            -1.1
+          ]
+        },
+        {
+          "id": "wall-311",
+          "a": [
+            6.5,
+            0.9
+          ],
+          "b": [
+            3.9,
+            0.9
+          ]
+        },
+        {
+          "id": "wall-312",
+          "a": [
+            3.9,
+            0.9
+          ],
+          "b": [
+            2.5,
+            0.9
+          ]
+        },
+        {
+          "id": "wall-332",
+          "a": [
+            -4.5,
+            -1.1
+          ],
+          "b": [
+            -4.5,
+            -0.6
+          ]
+        },
+        {
+          "id": "wall-333",
+          "a": [
+            -4.5,
+            -0.6
+          ],
+          "b": [
+            -4.5,
+            -0.10000000000000009
+          ]
+        },
+        {
+          "id": "wall-334",
+          "a": [
+            -4.5,
+            -0.1
+          ],
+          "b": [
+            -4.5,
+            2.9
+          ]
+        },
+        {
+          "id": "wall-336",
+          "a": [
+            -7.5,
+            6.4
+          ],
+          "b": [
+            -5.5,
+            6.4
+          ]
+        },
+        {
+          "id": "wall-337",
+          "a": [
+            -5.5,
+            6.4
+          ],
+          "b": [
+            -4.5,
+            6.4
+          ]
+        },
+        {
+          "id": "wall-338",
+          "a": [
+            6.5,
+            6.4
+          ],
+          "b": [
+            4,
+            6.4
+          ]
+        },
+        {
+          "id": "wall-339",
+          "a": [
+            4,
+            6.4
+          ],
+          "b": [
+            3.9000000000000004,
+            6.4
+          ]
+        },
+        {
+          "id": "wall-340",
+          "a": [
+            -7.5,
+            6.4
+          ],
+          "b": [
+            -9,
+            6.4
+          ]
+        },
+        {
+          "id": "wall-341",
+          "a": [
+            -9,
+            6.4
+          ],
+          "b": [
+            -10,
+            6.4
+          ]
+        },
+        {
+          "id": "wall-343",
+          "a": [
+            -7,
+            2.9000000000000004
+          ],
+          "b": [
+            -4.5,
+            2.9000000000000004
+          ]
+        },
+        {
+          "id": "wall-344",
+          "a": [
+            -9.5,
+            2.9
+          ],
+          "b": [
+            -9,
+            2.9
+          ]
+        },
+        {
+          "id": "wall-345",
+          "a": [
+            -9,
+            2.9
+          ],
+          "b": [
+            -7,
+            2.9
+          ]
+        }
+      ],
+      "rooms": [
+        {
+          "id": "room-6",
+          "name": "Kamar Anak",
+          "polygon": [
+            [
+              -2.5,
+              -1.1
+            ],
+            [
+              0.5,
+              -1.1
+            ],
+            [
+              0.5,
+              1.4
+            ],
+            [
+              -2.5,
+              1.4
+            ]
+          ],
+          "floor": "marblewhite"
+        },
+        {
+          "id": "room-39",
+          "name": "Ruang Tamu",
+          "polygon": [
+            [
+              0.5,
+              0.4
+            ],
+            [
+              2.5,
+              0.4
+            ],
+            [
+              2.5,
+              0.9
+            ],
+            [
+              3.9,
+              0.9
+            ],
+            [
+              3.9000000000000004,
+              3.9000000000000004
+            ],
+            [
+              2.5,
+              3.9
+            ],
+            [
+              0.5,
+              3.9
+            ],
+            [
+              -2.5,
+              3.9
+            ],
+            [
+              -2.5,
+              1.4
+            ],
+            [
+              0.5,
+              1.4
+            ]
+          ],
+          "floor": "marblewhite"
+        },
+        {
+          "id": "room-73",
+          "name": "Kamar Utama",
+          "polygon": [
+            [
+              -7.5,
+              7.9
+            ],
+            [
+              -4.5,
+              7.9
+            ],
+            [
+              -4.5,
+              10.4
+            ],
+            [
+              -7.5,
+              10.4
+            ]
+          ],
+          "floor": "marblewhite",
+          "elevation": 0.5
+        },
+        {
+          "id": "room-74",
+          "name": "Kamar mandi",
+          "polygon": [
+            [
+              -7.5,
+              6.4
+            ],
+            [
+              -5.5,
+              6.4
+            ],
+            [
+              -5.5,
+              6.4
+            ],
+            [
+              -5.5,
+              7.9
+            ],
+            [
+              -7.5,
+              7.9
+            ]
+          ],
+          "floor": "marblewhite",
+          "elevation": 0.5
+        },
+        {
+          "id": "room-88",
+          "name": "Dapur Kotor",
+          "polygon": [
+            [
+              6.5,
+              6.4
+            ],
+            [
+              4,
+              10.4
+            ],
+            [
+              4,
+              10.4
+            ],
+            [
+              4,
+              6.4
+            ]
+          ],
+          "floor": "marblewhite",
+          "elevation": 0.5
+        },
+        {
+          "id": "room-92",
+          "name": "Ruang Makan",
+          "polygon": [
+            [
+              1.5,
+              3.9
+            ],
+            [
+              6.5,
+              3.9
+            ],
+            [
+              6.5,
+              6.4
+            ],
+            [
+              1.5,
+              6.4
+            ]
+          ],
+          "floor": "marblewhite"
+        },
+        {
+          "id": "room-95",
+          "name": "Kosong",
+          "polygon": [
+            [
+              1.5,
+              3.9
+            ],
+            [
+              1.5,
+              6.4
+            ],
+            [
+              -1,
+              6.4
+            ],
+            [
+              -1,
+              3.9
+            ]
+          ],
+          "floor": "marblewhite",
+          "elevation": 0.25
+        },
+        {
+          "id": "room-103",
+          "name": "Ruang Konveksi",
+          "polygon": [
+            [
+              -5.5,
+              6.4
+            ],
+            [
+              1.5,
+              6.4
+            ],
+            [
+              1.5,
+              8.4
+            ],
+            [
+              1.5,
+              10.4
+            ],
+            [
+              -1.5,
+              10.4
+            ],
+            [
+              -1.5,
+              9.4
+            ],
+            [
+              -4.5,
+              9.4
+            ],
+            [
+              -4.5,
+              7.9
+            ],
+            [
+              -5.5,
+              7.9
+            ],
+            [
+              -5.5,
+              6.4
+            ]
+          ],
+          "floor": "marblewhite",
+          "elevation": 0.5
+        },
+        {
+          "id": "room-106",
+          "name": "Dapur Bersih",
+          "polygon": [
+            [
+              1.5,
+              6.4
+            ],
+            [
+              4,
+              6.4
+            ],
+            [
+              4,
+              10.4
+            ],
+            [
+              1.5,
+              10.4
+            ],
+            [
+              1.5,
+              8.4
+            ]
+          ],
+          "floor": "marblewhite",
+          "elevation": 0.5
+        },
+        {
+          "id": "room-279",
+          "name": "Kamar Anak",
+          "polygon": [
+            [
+              -10,
+              6.4
+            ],
+            [
+              -7.5,
+              6.4
+            ],
+            [
+              -7.5,
+              10.4
+            ],
+            [
+              -10,
+              10.4
+            ]
+          ],
+          "floor": "marblewhite",
+          "elevation": 0.5
+        },
+        {
+          "id": "room-280",
+          "name": "Kamar Utama 1",
+          "polygon": [
+            [
+              -9.5,
+              -1.1
+            ],
+            [
+              -7,
+              -1.1
+            ],
+            [
+              -7,
+              2.9000000000000004
+            ],
+            [
+              -9.5,
+              2.9
+            ]
+          ],
+          "floor": "marblewhite"
+        },
+        {
+          "id": "room-283",
+          "name": "Kamar Tamu",
+          "polygon": [
+            [
+              3.9,
+              0.9
+            ],
+            [
+              6.5,
+              0.9
+            ],
+            [
+              6.5,
+              3.9
+            ],
+            [
+              3.9000000000000004,
+              3.9000000000000004
+            ]
+          ],
+          "floor": "marblewhite"
+        },
+        {
+          "id": "room-284",
+          "name": "Kamar Mandi Tamu",
+          "polygon": [
+            [
+              -2.5,
+              3.9
+            ],
+            [
+              -1,
+              3.9
+            ],
+            [
+              -1,
+              6.4
+            ],
+            [
+              -2.5,
+              6.4
+            ]
+          ],
+          "floor": "marblewhite",
+          "elevation": 0.25
+        },
+        {
+          "id": "room-286",
+          "name": "Kamar Utama 2",
+          "polygon": [
+            [
+              -7,
+              -1.1
+            ],
+            [
+              -4.5,
+              -1.1
+            ],
+            [
+              -4.5,
+              2.9
+            ],
+            [
+              -7,
+              2.9
+            ]
+          ],
+          "floor": "marblewhite"
+        },
+        {
+          "id": "room-288",
+          "name": "Ruang Keluarga",
+          "polygon": [
+            [
+              -9,
+              2.9
+            ],
+            [
+              -4.5,
+              2.9
+            ],
+            [
+              -4.5,
+              6.4
+            ],
+            [
+              -9,
+              6.4
+            ]
+          ],
+          "floor": "marblewhite"
+        },
+        {
+          "id": "room-290",
+          "name": "Lorong",
+          "polygon": [
+            [
+              -4.5,
+              -0.6
+            ],
+            [
+              -2.5,
+              -0.6
+            ],
+            [
+              -2.5,
+              6.4
+            ],
+            [
+              -4.5,
+              6.4
+            ]
+          ],
+          "floor": "marblewhite"
+        }
+      ],
+      "openings": [
+        {
+          "id": "opening-20",
+          "wallId": "wall-2",
+          "type": "window",
+          "offset": 1,
+          "width": 0.5,
+          "height": 1.5,
+          "sill": 0.5,
+          "vent": true,
+          "ventHeight": 0.3
+        },
+        {
+          "id": "opening-62",
+          "wallId": "wall-2",
+          "type": "window",
+          "offset": 2,
+          "width": 0.5,
+          "height": 1.5,
+          "sill": 0.5,
+          "vent": true,
+          "ventHeight": 0.3
+        },
+        {
+          "id": "opening-80",
+          "wallId": "wall-79",
+          "type": "door",
+          "offset": 0.5,
+          "width": 0.9,
+          "height": 2.1,
+          "sill": 0,
+          "swing": -1
+        },
+        {
+          "id": "opening-82",
+          "wallId": "wall-72",
+          "type": "door",
+          "offset": 1,
+          "width": 0.9,
+          "height": 2.1,
+          "sill": 0
+        },
+        {
+          "id": "opening-83",
+          "wallId": "wall-66",
+          "type": "door",
+          "offset": 1.482,
+          "width": 0.9,
+          "height": 2.1,
+          "sill": 0
+        },
+        {
+          "id": "opening-84",
+          "wallId": "wall-77",
+          "type": "door",
+          "offset": 0.5,
+          "width": 0.9,
+          "height": 2.1,
+          "sill": 0,
+          "swing": -1
+        },
+        {
+          "id": "opening-113",
+          "wallId": "wall-112",
+          "type": "door",
+          "offset": 0.503,
+          "width": 0.9,
+          "height": 2.1,
+          "sill": 0,
+          "swing": -1
+        },
+        {
+          "id": "opening-177",
+          "wallId": "wall-5",
+          "type": "door",
+          "offset": 0.5,
+          "width": 0.9,
+          "height": 2.1,
+          "sill": 0,
+          "vent": false
+        },
+        {
+          "id": "opening-210",
+          "wallId": "wall-209",
+          "type": "door",
+          "offset": 2,
+          "width": 0.9,
+          "height": 2.1,
+          "sill": 0,
+          "swing": -1,
+          "hinge": -1
+        },
+        {
+          "id": "opening-247",
+          "wallId": "wall-244",
+          "type": "door",
+          "offset": 0.5,
+          "width": 0.9,
+          "height": 2.1,
+          "sill": 0,
+          "swing": -1
+        },
+        {
+          "id": "opening-248",
+          "wallId": "wall-246",
+          "type": "door",
+          "offset": 0.5,
+          "width": 0.9,
+          "height": 2.1,
+          "sill": 0,
+          "vent": false
+        },
+        {
+          "id": "opening-259",
+          "wallId": "wall-258",
+          "type": "window",
+          "offset": 1.5,
+          "width": 0.5,
+          "height": 1.5,
+          "sill": 0.5,
+          "vent": true,
+          "ventHeight": 0.3
+        },
+        {
+          "id": "opening-260",
+          "wallId": "wall-258",
+          "type": "window",
+          "offset": 2.5,
+          "width": 0.5,
+          "height": 1.5,
+          "sill": 0.5,
+          "vent": true,
+          "ventHeight": 0.3
+        },
+        {
+          "id": "opening-261",
+          "wallId": "wall-215",
+          "type": "window",
+          "offset": 1,
+          "width": 0.5,
+          "height": 1.5,
+          "sill": 0.5,
+          "vent": true,
+          "ventHeight": 0.3
+        },
+        {
+          "id": "opening-262",
+          "wallId": "wall-13",
+          "type": "window",
+          "offset": 0.5,
+          "width": 0.5,
+          "height": 1.5,
+          "sill": 0.5,
+          "vent": true,
+          "ventHeight": 0.3
+        },
+        {
+          "id": "opening-263",
+          "wallId": "wall-13",
+          "type": "window",
+          "offset": 1.5,
+          "width": 0.5,
+          "height": 1.5,
+          "sill": 0.5,
+          "vent": true,
+          "ventHeight": 0.3
+        },
+        {
+          "id": "opening-270",
+          "wallId": "wall-269",
+          "type": "door",
+          "offset": 2.475,
+          "width": 0.9,
+          "height": 2.1,
+          "sill": 0,
+          "swing": -1,
+          "hinge": -1
+        },
+        {
+          "id": "opening-275",
+          "wallId": "wall-271",
+          "type": "window",
+          "offset": 2,
+          "width": 0.5,
+          "height": 1.5,
+          "sill": 0.5,
+          "vent": true,
+          "ventHeight": 0.3
+        },
+        {
+          "id": "opening-276",
+          "wallId": "wall-271",
+          "type": "window",
+          "offset": 1,
+          "width": 0.5,
+          "height": 1.5,
+          "sill": 0.5,
+          "vent": true,
+          "ventHeight": 0.3
+        },
+        {
+          "id": "opening-293",
+          "wallId": "wall-291",
+          "type": "window",
+          "offset": 0.5,
+          "width": 0.5,
+          "height": 1.5,
+          "sill": 0.5,
+          "vent": true,
+          "ventHeight": 0.3
+        },
+        {
+          "id": "opening-296",
+          "wallId": "wall-294",
+          "type": "window",
+          "offset": 0.5,
+          "width": 0.5,
+          "height": 1.5,
+          "sill": 0.5,
+          "vent": true,
+          "ventHeight": 0.3
+        },
+        {
+          "id": "opening-297",
+          "wallId": "wall-295",
+          "type": "vent",
+          "offset": 0.75,
+          "width": 0.6,
+          "height": 0.25,
+          "sill": 2.3
+        },
+        {
+          "id": "opening-298",
+          "wallId": "wall-292",
+          "type": "vent",
+          "offset": 0.75,
+          "width": 0.6,
+          "height": 0.25,
+          "sill": 2.3
+        },
+        {
+          "id": "opening-300",
+          "wallId": "wall-68",
+          "type": "window",
+          "offset": 1,
+          "width": 0.5,
+          "height": 1.5,
+          "sill": 0.5,
+          "vent": true,
+          "ventHeight": 0.3
+        },
+        {
+          "id": "opening-301",
+          "wallId": "wall-68",
+          "type": "window",
+          "offset": 2,
+          "width": 0.5,
+          "height": 1.5,
+          "sill": 0.5,
+          "vent": true,
+          "ventHeight": 0.3
+        },
+        {
+          "id": "opening-302",
+          "wallId": "wall-69",
+          "type": "window",
+          "offset": 1,
+          "width": 0.5,
+          "height": 1.5,
+          "sill": 0.5,
+          "vent": true,
+          "ventHeight": 0.3
+        },
+        {
+          "id": "opening-303",
+          "wallId": "wall-69",
+          "type": "window",
+          "offset": 2,
+          "width": 0.5,
+          "height": 1.5,
+          "sill": 0.5,
+          "vent": true,
+          "ventHeight": 0.3
+        },
+        {
+          "id": "opening-304",
+          "wallId": "wall-66",
+          "type": "window",
+          "offset": 2.466,
+          "width": 0.5,
+          "height": 1.5,
+          "sill": 0.5,
+          "vent": true,
+          "ventHeight": 0.3
+        },
+        {
+          "id": "opening-305",
+          "wallId": "wall-66",
+          "type": "window",
+          "offset": 0.516,
+          "width": 0.5,
+          "height": 1.5,
+          "sill": 0.5,
+          "vent": true,
+          "ventHeight": 0.3
+        },
+        {
+          "id": "opening-306",
+          "wallId": "wall-77",
+          "type": "window",
+          "offset": 1.475,
+          "width": 0.5,
+          "height": 1.5,
+          "sill": 0.5,
+          "vent": true,
+          "ventHeight": 0.3
+        },
+        {
+          "id": "opening-307",
+          "wallId": "wall-189",
+          "type": "window",
+          "offset": 1,
+          "width": 0.5,
+          "height": 1.5,
+          "sill": 0.5,
+          "vent": true,
+          "ventHeight": 0.3
+        },
+        {
+          "id": "opening-308",
+          "wallId": "wall-217",
+          "type": "door",
+          "offset": 1.7500000000000002,
+          "width": 1.6,
+          "height": 2.1,
+          "sill": 0,
+          "leaves": 2,
+          "swing": -1
+        },
+        {
+          "id": "opening-309",
+          "wallId": "wall-217",
+          "type": "window",
+          "offset": 0.4750000000000001,
+          "width": 0.5,
+          "height": 1.5,
+          "sill": 0.5,
+          "vent": true,
+          "ventHeight": 0.3
+        },
+        {
+          "id": "opening-310",
+          "wallId": "wall-217",
+          "type": "window",
+          "offset": 3.0250000000000004,
+          "width": 0.5,
+          "height": 1.5,
+          "sill": 0.5,
+          "vent": true,
+          "ventHeight": 0.3
+        },
+        {
+          "id": "opening-313",
+          "wallId": "wall-312",
+          "type": "door",
+          "offset": 0.7,
+          "width": 1.2999999999999998,
+          "height": 2.1,
+          "sill": 0,
+          "leaves": 2,
+          "swing": -1,
+          "vent": false
+        },
+        {
+          "id": "opening-314",
+          "wallId": "wall-311",
+          "type": "window",
+          "offset": 1.8,
+          "width": 0.5,
+          "height": 1.5,
+          "sill": 0.5,
+          "vent": true,
+          "ventHeight": 0.3
+        },
+        {
+          "id": "opening-315",
+          "wallId": "wall-311",
+          "type": "window",
+          "offset": 0.8,
+          "width": 0.5,
+          "height": 1.5,
+          "sill": 0.5,
+          "vent": true,
+          "ventHeight": 0.3
+        },
+        {
+          "id": "opening-316",
+          "wallId": "wall-21",
+          "type": "door",
+          "offset": 0.8500000000000001,
+          "width": 1.6,
+          "height": 2.1,
+          "sill": 0,
+          "vent": true,
+          "ventHeight": 0.3,
+          "leaves": 2
+        },
+        {
+          "id": "opening-335",
+          "wallId": "wall-334",
+          "type": "door",
+          "offset": 1,
+          "width": 0.9,
+          "height": 2.1,
+          "sill": 0
+        },
+        {
+          "id": "opening-342",
+          "wallId": "wall-340",
+          "type": "door",
+          "offset": 0.5,
+          "width": 0.9,
+          "height": 2.1,
+          "sill": 0,
+          "swing": -1
+        },
+        {
+          "id": "opening-346",
+          "wallId": "wall-345",
+          "type": "door",
+          "offset": 1.5,
+          "width": 0.9,
+          "height": 2.1,
+          "sill": 0,
+          "swing": -1,
+          "hinge": -1
+        }
+      ],
+      "decor": {
+        "curtains": [],
+        "rods": [],
+        "rugs": []
+      },
+      "roofs": [
+        {
+          "id": "roof-318",
+          "minX": -9.5,
+          "maxX": -4.5,
+          "minZ": -1.1,
+          "maxZ": 6.4,
+          "type": "hip",
+          "pitch": 25,
+          "overhang": 0.5,
+          "ridge": "auto",
+          "flip": 1,
+          "material": "genteng",
+          "color": null,
+          "thickness": 0.12,
+          "points": [
+            [
+              -9.5,
+              -1.1
+            ],
+            [
+              -4.5,
+              -1.1
+            ],
+            [
+              -4.5,
+              6.4
+            ],
+            [
+              -9.5,
+              6.4
+            ]
+          ],
+          "base": 0.2
+        },
+        {
+          "id": "roof-319",
+          "minX": -9.5,
+          "maxX": -4.5,
+          "minZ": 6.4,
+          "maxZ": 10.4,
+          "type": "hip",
+          "pitch": 25,
+          "overhang": 0.5,
+          "ridge": "auto",
+          "flip": 1,
+          "material": "genteng",
+          "color": null,
+          "thickness": 0.12,
+          "points": [
+            [
+              -9.5,
+              6.4
+            ],
+            [
+              -4.5,
+              6.4
+            ],
+            [
+              -4.5,
+              10.4
+            ],
+            [
+              -9.5,
+              10.4
+            ]
+          ],
+          "base": 0.6
+        },
+        {
+          "id": "roof-320",
+          "minX": -4.5,
+          "maxX": 6.5,
+          "minZ": -1.1,
+          "maxZ": 6.4,
+          "type": "hip",
+          "pitch": 25,
+          "points": [
+            [
+              -4.5,
+              -1.1
+            ],
+            [
+              0.5,
+              -1.1
+            ],
+            [
+              0.5,
+              0.3999999999999999
+            ],
+            [
+              2.5,
+              0.3999999999999999
+            ],
+            [
+              2.5,
+              0.8999999999999999
+            ],
+            [
+              6.5,
+              0.8999999999999999
+            ],
+            [
+              6.5,
+              6.4
+            ],
+            [
+              1.5,
+              6.4
+            ],
+            [
+              1.5,
+              3.9
+            ],
+            [
+              -4.4,
+              3.9
+            ]
+          ],
+          "base": 0.1,
+          "overhang": 0.5,
+          "ridge": "auto",
+          "flip": 1,
+          "material": "genteng",
+          "color": null,
+          "thickness": 0.12
+        },
+        {
+          "id": "roof-321",
+          "minX": -1.5,
+          "maxX": 6.5,
+          "minZ": 3.9,
+          "maxZ": 10.4,
+          "type": "hip",
+          "pitch": 25,
+          "points": [
+            [
+              -1.5,
+              3.9000000000000004
+            ],
+            [
+              6.5,
+              3.9
+            ],
+            [
+              6.5,
+              6.4
+            ],
+            [
+              4,
+              10.4
+            ],
+            [
+              -1.5,
+              10.4
+            ]
+          ],
+          "base": 0.6,
+          "overhang": 0.5,
+          "ridge": "auto",
+          "flip": 1,
+          "material": "genteng",
+          "color": null,
+          "thickness": 0.12
+        },
+        {
+          "id": "roof-322",
+          "minX": -4.5,
+          "maxX": -1.5,
+          "minZ": 3.9000000000000004,
+          "maxZ": 9.4,
+          "type": "hip",
+          "pitch": 25,
+          "points": [
+            [
+              -4.5,
+              3.9000000000000004
+            ],
+            [
+              -1.5,
+              3.9000000000000004
+            ],
+            [
+              -1.5,
+              9.4
+            ],
+            [
+              -4.5,
+              9.4
+            ]
+          ],
+          "base": 0.6,
+          "overhang": 0.5,
+          "ridge": "auto",
+          "flip": 1,
+          "material": "genteng",
+          "color": null,
+          "thickness": 0.12
+        },
+        {
+          "id": "roof-324",
+          "minX": 0.6000000000000001,
+          "maxX": 6.5,
+          "minZ": -1.6,
+          "maxZ": 0.9,
+          "type": "canopy",
+          "pitch": 6,
+          "points": [
+            [
+              0.6000000000000001,
+              -1.6
+            ],
+            [
+              6.5,
+              -1.6
+            ],
+            [
+              6.5,
+              0.9
+            ],
+            [
+              2.5,
+              0.9
+            ],
+            [
+              2.5,
+              0.4
+            ],
+            [
+              0.6000000000000001,
+              0.4
+            ]
+          ],
+          "base": 0,
+          "overhang": 0,
+          "ridge": "auto",
+          "flip": 1,
+          "material": "kaca",
+          "color": null,
+          "thickness": 0.12,
+          "height": 2.5,
+          "posts": true
+        },
+        {
+          "id": "roof-325",
+          "minX": -12,
+          "maxX": -8.950000000000001,
+          "minZ": 2.8000000000000003,
+          "maxZ": 6.45,
+          "type": "canopy",
+          "pitch": 6,
+          "points": [
+            [
+              -12,
+              2.8000000000000003
+            ],
+            [
+              -8.950000000000001,
+              2.85
+            ],
+            [
+              -8.950000000000001,
+              6.45
+            ],
+            [
+              -12,
+              6.45
+            ]
+          ],
+          "base": 0,
+          "overhang": 0,
+          "ridge": "auto",
+          "flip": 1,
+          "material": "kaca",
+          "color": null,
+          "thickness": 0.12,
+          "height": 2.5,
+          "posts": true
+        }
+      ],
+      "yards": [
+        {
+          "id": "yard-323",
+          "name": "Halaman",
+          "minX": -4.5,
+          "maxX": -2.5,
+          "minZ": -1.1,
+          "maxZ": -0.6,
+          "ground": "grass",
+          "color": null,
+          "plants": "sparse",
+          "points": [
+            [
+              -4.5,
+              -1.1
+            ],
+            [
+              -2.5,
+              -1.1
+            ],
+            [
+              -2.5,
+              -0.6
+            ],
+            [
+              -4.5,
+              -0.6
+            ]
+          ],
+          "elevation": 0
+        },
+        {
+          "id": "yard-326",
+          "name": "Halaman",
+          "minX": -10.5,
+          "maxX": -9.5,
+          "minZ": -1.1,
+          "maxZ": 2.9000000000000004,
+          "ground": "grass",
+          "color": null,
+          "plants": "sparse",
+          "points": [
+            [
+              -10.5,
+              -1.1
+            ],
+            [
+              -9.5,
+              -1.1
+            ],
+            [
+              -9.5,
+              2.9000000000000004
+            ],
+            [
+              -10.5,
+              2.9000000000000004
+            ]
+          ],
+          "elevation": 0
+        },
+        {
+          "id": "yard-327",
+          "name": "Halaman",
+          "minX": -10.5,
+          "maxX": -9.5,
+          "minZ": 6.4,
+          "maxZ": 10.4,
+          "ground": "grass",
+          "color": null,
+          "plants": "sparse",
+          "points": [
+            [
+              -10.5,
+              6.4
+            ],
+            [
+              -9.5,
+              6.4
+            ],
+            [
+              -9.5,
+              10.4
+            ],
+            [
+              -10.5,
+              10.4
+            ]
+          ],
+          "elevation": 0
+        },
+        {
+          "id": "yard-328",
+          "name": "Halaman",
+          "minX": -10.5,
+          "maxX": -4.5,
+          "minZ": 10.4,
+          "maxZ": 11.4,
+          "ground": "grass",
+          "color": null,
+          "plants": "sparse",
+          "points": [
+            [
+              -10.5,
+              10.4
+            ],
+            [
+              -4.5,
+              10.4
+            ],
+            [
+              -4.5,
+              11.4
+            ],
+            [
+              -10.5,
+              11.4
+            ]
+          ],
+          "elevation": 0
+        },
+        {
+          "id": "yard-330",
+          "name": "Teras",
+          "minX": -11,
+          "maxX": -9,
+          "minZ": 2.9,
+          "maxZ": 6.4,
+          "ground": "paving",
+          "color": null,
+          "plants": "none",
+          "points": [
+            [
+              -11,
+              2.9
+            ],
+            [
+              -9,
+              2.9
+            ],
+            [
+              -9,
+              6.4
+            ],
+            [
+              -11,
+              6.4
+            ]
+          ],
+          "elevation": 0.15
+        },
+        {
+          "id": "yard-331",
+          "name": "Teras",
+          "minX": 0.5,
+          "maxX": 6.5,
+          "minZ": -1.1,
+          "maxZ": 0.8999999999999999,
+          "ground": "paving",
+          "color": null,
+          "plants": "none",
+          "points": [
+            [
+              0.5,
+              -1.1
+            ],
+            [
+              1.5,
+              -1.1
+            ],
+            [
+              2.5,
+              -1.1
+            ],
+            [
+              3,
+              -1.1
+            ],
+            [
+              3,
+              -0.5
+            ],
+            [
+              6.5,
+              -0.5
+            ],
+            [
+              6.5,
+              0.8999999999999999
+            ],
+            [
+              2.5,
+              0.8999999999999999
+            ],
+            [
+              2.5,
+              0.3999999999999999
+            ],
+            [
+              0.5,
+              0.3999999999999999
+            ]
+          ],
+          "elevation": 0.15
+        }
+      ],
+      "stairs": []
+    }
+  ],
+  "furniture": [
+    {
+      "id": "floor-lamp-1",
+      "type": "floor-lamp",
+      "floor": "floor-1",
+      "position": [
+        -0.99,
+        8.436
+      ],
+      "rotation": 0,
+      "color": "#fef3c7"
+    }
+  ],
+  "dimensions": [
+    {
+      "from": "coffee-table",
+      "to": "tv-console"
+    },
+    {
+      "from": "coffee-table",
+      "to": "armchair"
+    },
+    {
+      "from": "sofa",
+      "to": "coffee-table"
+    }
+  ]
+}

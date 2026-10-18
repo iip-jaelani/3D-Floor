@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>3D Floor Studio</title>
+    <script>
+      try {
+        if (localStorage.getItem('floor-studio:theme') === 'light') document.documentElement.dataset.theme = 'light';
+      } catch (e) {}
+    </script>
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect width='16' height='16' rx='3' fill='%2338bdf8'/%3E%3Cpath d='M3 6l5-3 5 3v6l-5 2-5-2z' fill='%230f172a'/%3E%3C/svg%3E" />
+  </head>
+  <body class="text-slate-100" data-mode="3d">
+    <div class="app">
+      <header id="menubar" class="app-menubar hide-in-tour">
+        <div class="brand"><i class="fa-solid fa-cube"></i></div>
+
+        <nav class="menus">
+          <div class="menu">
+            <button class="menu-trigger">Berkas</button>
+            <div class="menu-list">
+              <button class="menu-item" data-click="#btn-import"><i class="fa-solid fa-folder-open"></i>Buka denah…</button>
+              <button class="menu-item" data-click="#btn-export"><i class="fa-solid fa-download"></i>Unduh denah (JSON)</button>
+              <div class="menu-sep"></div>
+              <button class="menu-item" data-click="#btn-reset"><i class="fa-solid fa-rotate-left"></i>Kembali ke contoh</button>
+              <div class="menu-sep"></div>
+              <button class="menu-item" id="menu-rab"><i class="fa-solid fa-calculator"></i>RAB & kuantitas…</button>
+              <button class="menu-item" id="menu-print-sheet"><i class="fa-solid fa-print"></i>Cetak gambar kerja (A3 / PDF)…</button>
+              <button class="menu-item" id="menu-export-dxf"><i class="fa-solid fa-drafting-compass"></i>Ekspor DXF (CAD)</button>
+              <button class="menu-item" id="menu-export-glb"><i class="fa-solid fa-cube"></i>Ekspor model 3D (GLB)</button>
+              <button class="menu-item" data-soon><i class="fa-solid fa-file-pdf"></i>Ekspor PDF / PNG<kbd>Segera</kbd></button>
+              <button class="menu-item" data-soon><i class="fa-solid fa-print"></i>Cetak<kbd>Segera</kbd></button>
+            </div>
+          </div>
+
+          <div class="menu">
+            <button class="menu-trigger">Edit</button>
+            <div class="menu-list">
+              <button class="menu-item" data-click="#editor-undo"><i class="fa-solid fa-rotate-left"></i>Urungkan<kbd>Ctrl+Z</kbd></button>
+              <button class="menu-item" data-click="#editor-redo"><i class="fa-solid fa-rotate-right"></i>Ulangi<kbd>Ctrl+Shift+Z</kbd></button>
+              <div class="menu-sep"></div>
+              <button class="menu-item" data-click="#editor-tidy"><i class="fa-solid fa-wand-magic-sparkles"></i>Rapikan denah</button>
+              <button class="menu-item" data-soon><i class="fa-regular fa-copy"></i>Salin / Tempel<kbd>Segera</kbd></button>
+            </div>
+          </div>
+
+          <div class="menu">
+            <button class="menu-trigger">Tampilan</button>
+            <div class="menu-list">
+              <button class="menu-item" data-click="#btn-dimensions"><i class="fa-solid fa-ruler-combined"></i>Tampilkan ukuran</button>
+              <button class="menu-item" data-click="#btn-wallmode"><i class="fa-solid fa-layer-group"></i>Ganti mode tembok</button>
+              <button class="menu-item" data-click="#btn-theme"><i class="fa-solid fa-circle-half-stroke"></i>Mode terang / gelap</button>
+              <button class="menu-item" data-click="#btn-daynight"><i class="fa-solid fa-sun"></i>Siang / malam</button>
+              <div class="menu-sep"></div>
+              <button class="menu-item" data-click="#editor-fit"><i class="fa-solid fa-expand"></i>Pas ke layar (denah)</button>
+              <button class="menu-item" data-click="#btn-rulers"><i class="fa-solid fa-ruler-horizontal"></i>Penggaris</button>
+              <button class="menu-item" data-click="#btn-grid"><i class="fa-solid fa-border-all"></i>Garis grid</button>
+              <button class="menu-item" data-click="#btn-roomcolors"><i class="fa-solid fa-palette"></i>Warna tiap ruangan</button>
+              <button class="menu-item" id="menu-clear-guides"><i class="fa-solid fa-ruler-combined"></i>Hapus semua garis panduan</button>
+              <button class="menu-item" data-click="#btn-crosshair"><i class="fa-solid fa-crosshairs"></i>Kursor plus &amp; garis bidik</button>
+              <button class="menu-item" data-click="#btn-technical"><i class="fa-solid fa-drafting-compass"></i>Gambar kerja (ukuran &amp; kode)</button>
+              <button class="menu-item" data-click="#btn-lines"><i class="fa-solid fa-vector-polygon"></i>Tampilan garis (CAD)<kbd>L</kbd></button>
+            </div>
+          </div>
+
+          <div class="menu">
+            <button class="menu-trigger">Gambar</button>
+            <div class="menu-list">
+              <button class="menu-item" data-click="[data-tool='select']"><i class="fa-solid fa-arrow-pointer"></i>Pilih<kbd>V</kbd></button>
+              <button class="menu-item" data-click="[data-tool='wall']"><i class="fa-solid fa-minus"></i>Tembok lurus<kbd>W</kbd></button>
+              <button class="menu-item" data-click="[data-tool='arc']"><i class="fa-solid fa-bezier-curve"></i>Tembok lengkung<kbd>A</kbd></button>
+              <button class="menu-item" data-click="[data-tool='room']"><i class="fa-regular fa-square"></i>Ruangan<kbd>R</kbd></button>
+              <button class="menu-item" data-click="[data-tool='vertex']"><i class="fa-solid fa-circle-plus"></i>Tambah / hapus titik<kbd>P</kbd></button>
+              <div class="menu-sep"></div>
+              <button class="menu-item" data-click="[data-tool='corner-round']"><i class="fa-solid fa-circle-notch"></i>Sudut bundar<kbd>C</kbd></button>
+              <button class="menu-item" data-click="[data-tool='corner-chamfer']"><i class="fa-solid fa-slash"></i>Sudut pahat<kbd>X</kbd></button>
+              <div class="menu-sep"></div>
+              <button class="menu-item" data-click="[data-tool='door']"><i class="fa-solid fa-door-open"></i>Pintu<kbd>D</kbd></button>
+              <button class="menu-item" data-click="[data-tool='window']"><i class="fa-regular fa-window-maximize"></i>Jendela<kbd>N</kbd></button>
+              <button class="menu-item" data-click="[data-tool='door-double']"><i class="fa-solid fa-door-closed"></i>Pintu dua daun<kbd>G</kbd></button>
+              <button class="menu-item" data-click="[data-tool='niche']"><i class="fa-regular fa-square-minus"></i>Cekungan<kbd>E</kbd></button>
+              <button class="menu-item" data-click="[data-tool='vent']"><i class="fa-solid fa-wind"></i>Lubang angin<kbd>F</kbd></button>
+              <div class="menu-sep"></div>
+              <button class="menu-item" data-click="[data-tool='ruler']"><i class="fa-solid fa-ruler"></i>Ukur (meteran)<kbd>M</kbd></button>
+              <div class="menu-sep"></div>
+              <button class="menu-item" data-click="[data-tool='stairs']"><i class="fa-solid fa-stairs"></i>Tangga<kbd>U</kbd></button>
+              <button class="menu-item" data-click="[data-tool='roof']"><i class="fa-solid fa-house-chimney"></i>Atap<kbd>T</kbd></button>
+              <button class="menu-item" data-click="[data-tool='canopy']"><i class="fa-solid fa-umbrella"></i>Kanopi<kbd>K</kbd></button>
+              <button class="menu-item" data-click="[data-tool='terrace']"><i class="fa-solid fa-table-cells-large"></i>Teras<kbd>Y</kbd></button>
+              <button class="menu-item" data-click="[data-tool='yard']"><i class="fa-solid fa-tree"></i>Halaman / taman<kbd>H</kbd></button>
+              <button class="menu-item" data-soon><i class="fa-regular fa-circle"></i>Garis &amp; bentuk bebas<kbd>Segera</kbd></button>
+            </div>
+          </div>
+
+          <div class="menu">
+            <button class="menu-trigger">Kamera</button>
+            <div class="menu-list">
+              <button class="menu-item" data-click="#btn-reset-cam"><i class="fa-solid fa-video"></i>Reset sudut kamera</button>
+              <button class="menu-item" data-click="#btn-tour"><i class="fa-solid fa-person-walking"></i>Mulai tour</button>
+              <div class="menu-sep"></div>
+              <button class="menu-item" data-soon><i class="fa-solid fa-arrows-up-down-left-right"></i>Tampak atas / depan / samping<kbd>Segera</kbd></button>
+              <button class="menu-item" data-soon><i class="fa-solid fa-camera"></i>Perspektif / paralel<kbd>Segera</kbd></button>
+            </div>
+          </div>
+
+          <div class="menu">
+            <button class="menu-trigger">Bantuan</button>
+            <div class="menu-list">
+              <button class="menu-item" data-soon><i class="fa-regular fa-keyboard"></i>Pintasan keyboard<kbd>Segera</kbd></button>
+              <button class="menu-item" data-soon><i class="fa-solid fa-circle-info"></i>Tentang<kbd>Segera</kbd></button>
+            </div>
+          </div>
+        </nav>
+
+        <div class="doc-title">
+          <span id="house-name">3D Living Room Studio</span>
+          <span id="save-badge" class="text-[10px] border px-2 py-0.5 rounded-full font-medium"></span>
+        </div>
+      </header>
+
+      <div id="toolbar" class="app-toolbar hide-in-tour">
+        <div class="tb-group">
+          <button id="btn-import" class="tb-btn icon" title="Buka file denah (JSON)"><i class="fa-solid fa-folder-open"></i></button>
+          <button id="btn-export" class="tb-btn icon" title="Unduh denah (JSON)"><i class="fa-solid fa-download"></i></button>
+          <button id="btn-reset" class="tb-btn icon" title="Kembali ke denah contoh"><i class="fa-solid fa-rotate-left"></i></button>
+          <input id="import-file" type="file" accept=".json,application/json" class="hidden" />
+        </div>
+
+        <div class="tb-sep"></div>
+
+        <div class="tb-group seg">
+          <button id="mode-3d" class="tb-btn mode-btn active"><i class="fa-solid fa-cube"></i> 3D</button>
+          <button id="mode-2d" class="tb-btn mode-btn"><i class="fa-solid fa-pen-ruler"></i> Denah 2D</button>
+        </div>
+
+        <div class="tb-sep"></div>
+
+        <div class="tb-group">
+          <button id="btn-theme" class="tb-btn" title="Ganti ke mode terang"><i class="fa-solid fa-sun"></i><span>Terang</span></button>
+          <button id="btn-dimensions" class="tb-btn active" title="Tampilkan ukuran"><i class="fa-solid fa-ruler-combined"></i><span>Ukuran (m)</span></button>
+          <button id="btn-rulers" class="only-2d tb-btn active" title="Penggaris di tepi kanvas"><i class="fa-solid fa-ruler-horizontal"></i><span>Penggaris</span></button>
+          <button id="btn-grid" class="only-2d tb-btn" title="Garis grid di kanvas"><i class="fa-solid fa-border-all"></i><span>Grid</span></button>
+          <button id="btn-roomcolors" class="only-2d tb-btn active" title="Warna sorotan berbeda tiap ruangan"><i class="fa-solid fa-palette"></i><span>Warna ruangan</span></button>
+          <button id="btn-crosshair" class="only-2d tb-btn active" title="Kursor tanda plus + garis bidik putus-putus X dan Y untuk cek kelurusan"><i class="fa-solid fa-crosshairs"></i><span>Garis bidik</span></button>
+          <button id="btn-technical" class="only-2d tb-btn" title="Gambar kerja: ukuran ujung ke ujung, sumbu grid, kode & tabel pintu/jendela"><i class="fa-solid fa-drafting-compass"></i><span>Gambar kerja</span></button>
+          <button id="btn-lines" class="only-2d tb-btn" title="Tampilan garis saja, tanpa warna isi (L)"><i class="fa-solid fa-vector-polygon"></i><span>Garis</span></button>
+          <button id="btn-wallmode" class="only-3d tb-btn" title="Mode tampilan tembok"><i class="fa-solid fa-layer-group"></i><span id="text-wallmode">Potongan</span></button>
+          <button id="btn-realistic" class="only-3d tb-btn" title="Mode realistis: ambient occlusion + anti-aliasing (lebih berat)"><i class="fa-solid fa-wand-magic-sparkles"></i><span>Realistis</span></button>
+          <button id="btn-roofs" class="only-3d tb-btn active" title="Tampilkan / sembunyikan atap"><i class="fa-solid fa-house-chimney"></i><span>Atap</span></button>
+          <button id="btn-daynight" class="only-3d tb-btn" title="Siang / malam"><i class="fa-solid fa-sun text-amber-400" id="icon-daynight"></i><span id="text-daynight">Siang</span></button>
+          <button id="btn-reset-cam" class="only-3d tb-btn" title="Reset sudut kamera"><i class="fa-solid fa-video"></i><span>Kamera</span></button>
+        </div>
+
+        <div class="tb-sep only-3d"></div>
+
+        <div class="tb-group only-3d">
+          <button id="btn-tour" class="tb-btn" title="Jalan-jalan di dalam rumah (orang pertama)"><i class="fa-solid fa-person-walking text-emerald-400"></i><span>Tour</span></button>
+        </div>
+
+        <div class="tb-spacer"></div>
+
+        <div class="tb-group">
+          <button class="tb-btn" disabled title="Segera hadir"><i class="fa-solid fa-file-export"></i><span>Ekspor</span></button>
+          <button class="tb-btn" disabled title="Segera hadir"><i class="fa-solid fa-gear"></i></button>
+        </div>
+      </div>
+
+      <aside id="leftbar" class="app-left hide-in-tour">
+        <div id="editor-toolbar" class="only-2d palette">
+          <button class="editor-tool active" data-tool="select" title="Pilih (V)"><i class="fa-solid fa-arrow-pointer"></i><span>Pilih</span></button>
+          <div class="palette-sep"></div>
+          <button class="editor-tool" data-tool="wall" title="Tembok lurus (W) — ketik angka + Enter untuk panjang tepat"><i class="fa-solid fa-minus"></i><span>Tembok</span></button>
+          <button class="editor-tool" data-tool="arc" title="Tembok lengkung (A)"><i class="fa-solid fa-bezier-curve"></i><span>Lengkung</span></button>
+          <button class="editor-tool" data-tool="room" title="Ruangan (R)"><i class="fa-regular fa-square"></i><span>Ruangan</span></button>
+          <button class="editor-tool" data-tool="vertex" title="Tambah / hapus titik sudut (P)"><i class="fa-solid fa-circle-plus"></i><span>Titik</span></button>
+          <div class="palette-sep"></div>
+          <button class="editor-tool" data-tool="corner-round" title="Sudut bundar (C)"><i class="fa-solid fa-circle-notch"></i><span>Bundar</span></button>
+          <button class="editor-tool" data-tool="corner-chamfer" title="Sudut pahat / potong diagonal (X)"><i class="fa-solid fa-slash"></i><span>Pahat</span></button>
+          <div class="palette-sep"></div>
+          <button class="editor-tool" data-tool="door" title="Pintu (D)"><i class="fa-solid fa-door-open"></i><span>Pintu</span></button>
+          <button class="editor-tool" data-tool="door-double" title="Pintu dua daun (G)"><i class="fa-solid fa-door-closed"></i><span>Pintu ganda</span></button>
+          <button class="editor-tool" data-tool="window" title="Jendela (N)"><i class="fa-regular fa-window-maximize"></i><span>Jendela</span></button>
+          <button class="editor-tool" data-tool="niche" title="Cekungan / relung (E)"><i class="fa-regular fa-square-minus"></i><span>Cekungan</span></button>
+          <button class="editor-tool" data-tool="vent" title="Lubang angin / ventilasi (F)"><i class="fa-solid fa-wind"></i><span>Lubang angin</span></button>
+          <div class="palette-sep"></div>
+          <button class="editor-tool" data-tool="ruler" title="Ukur / meteran (M)"><i class="fa-solid fa-ruler"></i><span>Ukur</span></button>
+          <button class="editor-tool" data-soon disabled title="Tangga (segera)"><i class="fa-solid fa-stairs"></i><span>Tangga</span></button>
+          <button class="editor-tool" data-tool="roof" title="Atap (T)"><i class="fa-solid fa-house-chimney"></i><span>Atap</span></button>
+          <button class="editor-tool" data-tool="canopy" title="Kanopi / carport (K)"><i class="fa-solid fa-umbrella"></i><span>Kanopi</span></button>
+          <button class="editor-tool" data-tool="stairs" title="Tangga (U)"><i class="fa-solid fa-stairs"></i><span>Tangga</span></button>
+          <button class="editor-tool" data-tool="terrace" title="Teras (Y)"><i class="fa-solid fa-table-cells-large"></i><span>Teras</span></button>
+          <button class="editor-tool" data-tool="yard" title="Halaman / taman (H)"><i class="fa-solid fa-tree"></i><span>Halaman</span></button>
+          <button class="editor-tool" data-soon disabled title="Teks (segera)"><i class="fa-solid fa-font"></i><span>Teks</span></button>
+          <div class="palette-sep"></div>
+          <button class="editor-tool" id="editor-undo" title="Urungkan (Ctrl+Z)"><i class="fa-solid fa-rotate-left"></i><span>Undo</span></button>
+          <button class="editor-tool" id="editor-redo" title="Ulangi (Ctrl+Shift+Z)"><i class="fa-solid fa-rotate-right"></i><span>Redo</span></button>
+          <button class="editor-tool" id="editor-fit" title="Pas ke layar"><i class="fa-solid fa-expand"></i><span>Pas</span></button>
+          <button class="editor-tool" id="editor-tidy" title="Bulatkan angka &amp; isi lantai pada area tertutup yang belum punya lantai"><i class="fa-solid fa-wand-magic-sparkles"></i><span>Rapikan</span></button>
+        </div>
+
+        <div id="tools-3d" class="only-3d palette">
+          <button id="dock-catalog" class="editor-tool" title="Katalog furnitur"><i class="fa-solid fa-couch"></i><span>Furnitur</span></button>
+          <button id="dock-walls" class="editor-tool" title="Warna dinding &amp; motif lantai"><i class="fa-solid fa-paint-roller"></i><span>Dinding</span></button>
+          <div class="palette-sep"></div>
+          <button id="dock-rotate" class="editor-tool" title="Putar 45° objek terpilih"><i class="fa-solid fa-rotate-right"></i><span>Putar 45°</span></button>
+          <button id="dock-material" class="editor-tool" title="Ganti warna objek terpilih"><i class="fa-solid fa-palette"></i><span>Warna</span></button>
+          <div class="palette-sep"></div>
+          <button class="editor-tool" disabled title="Ukur (segera)"><i class="fa-solid fa-ruler"></i><span>Ukur</span></button>
+          <button class="editor-tool" disabled title="Potongan (segera)"><i class="fa-solid fa-scissors"></i><span>Potong</span></button>
+        </div>
+      </aside>
+
+      <main id="viewport" class="app-view">
+        <div id="canvas-container" class="only-3d"></div>
+        <div id="labels-container" class="only-3d hide-in-tour"></div>
+        <canvas id="plan-canvas" class="only-2d" style="touch-action: none"></canvas>
+
+        <div id="catalog-modal" class="only-3d hide-in-tour flyout hidden w-[460px]">
+          <div class="flyout-head">
+            <span><i class="fa-solid fa-couch text-sky-400"></i> Tambah Furnitur ke Ruangan</span>
+            <button data-close="catalog-modal" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
+          </div>
+          <div id="catalog-grid" class="grid grid-cols-4 gap-2.5 text-center text-xs max-h-[50vh] overflow-y-auto pr-1"></div>
+        </div>
+
+        <div id="room-style-modal" class="only-3d hide-in-tour flyout hidden w-[360px]">
+          <div class="flyout-head">
+            <span><i class="fa-solid fa-paint-roller text-sky-400"></i> Kustomisasi Dinding &amp; Lantai</span>
+            <button data-close="room-style-modal" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
+          </div>
+          <div class="space-y-3 text-xs">
+            <div>
+              <span class="text-slate-400 block mb-1.5">Motif Lantai Kayu / Marmer:</span>
+              <div id="floor-options" class="grid grid-cols-3 gap-2"></div>
+            </div>
+            <div>
+              <span class="text-slate-400 block mb-1.5">Warna Dinding:</span>
+              <div id="wall-options" class="grid grid-cols-4 gap-2"></div>
+            </div>
+          </div>
+        </div>
+      </main>
+
+      <aside id="dock" class="app-right hide-in-tour">
+        <section class="dock-section">
+          <h2 class="dock-title"><i class="fa-solid fa-sliders"></i> Properti</h2>
+          <div class="dock-body">
+            <div id="plan-inspector" class="only-2d text-xs"></div>
+
+            <div class="only-3d">
+              <p id="inspector-empty" class="empty-note">Klik furnitur, gorden, atau karpet di 3D untuk melihat propertinya.</p>
+              <div id="inspector-panel" class="hidden">
+                <div class="flex justify-between items-center border-b border-white/10 pb-2 mb-3">
+                  <div>
+                    <span class="text-[10px] uppercase tracking-wider text-sky-400 font-semibold">Objek Terpilih</span>
+                    <h3 id="selected-name" class="text-sm font-bold text-white"></h3>
+                  </div>
+                  <button id="btn-deselect" class="text-slate-400 hover:text-white text-xs p-1">
+                    <i class="fa-solid fa-xmark text-sm"></i>
+                  </button>
+                </div>
+
+                <div class="space-y-3 text-xs">
+                  <div data-furniture-only class="flex justify-between items-center text-slate-300">
+                    <span>Posisi (X, Z):</span>
+                    <span id="selected-pos" class="font-mono text-sky-300">0.0m, 0.0m</span>
+                  </div>
+                  <div data-furniture-only class="flex justify-between items-center text-slate-300">
+                    <span>Rotasi:</span>
+                    <span id="selected-rot" class="font-mono text-emerald-300">0°</span>
+                  </div>
+
+                  <div data-furniture-only class="pt-1">
+                    <label class="text-[11px] text-slate-400 block mb-1">Putar Halus (0° - 360°)</label>
+                    <input id="rot-slider" type="range" min="0" max="360" value="0" class="w-full accent-sky-400 cursor-pointer h-1.5 bg-slate-700 rounded-lg" />
+                  </div>
+
+                  <div data-furniture-only class="pt-2 border-t border-white/10">
+                    <label class="text-[11px] text-slate-400 block mb-2">Ganti Warna / Material:</label>
+                    <div class="flex gap-2 flex-wrap" id="material-swatches"></div>
+                  </div>
+
+                  <div class="pt-3 border-t border-white/10 flex gap-2">
+                    <button id="btn-duplicate" data-furniture-only class="flex-1 bg-white/10 hover:bg-white/15 text-white py-2 rounded-lg font-medium transition flex items-center justify-center gap-1.5">
+                      <i class="fa-regular fa-copy"></i> Duplikat
+                    </button>
+                    <button id="btn-delete" class="flex-1 bg-rose-500/20 hover:bg-rose-500/30 text-rose-300 border border-rose-500/30 py-2 rounded-lg font-medium transition flex items-center justify-center gap-1.5">
+                      <i class="fa-regular fa-trash-can"></i> Hapus
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="dock-section">
+          <h2 class="dock-title"><i class="fa-solid fa-layer-group"></i> Lantai</h2>
+          <div class="dock-body"><div id="floor-tabs" class="flex flex-col gap-1"></div></div>
+        </section>
+
+        <section class="dock-section only-2d">
+          <h2 class="dock-title"><i class="fa-solid fa-tags"></i> Layer</h2>
+          <div class="dock-body">
+            <div id="layer-list" class="flex flex-col gap-0.5"></div>
+            <p class="empty-note mt-2">Mata = tampil/sembunyi. Gembok = tidak bisa terpilih, jadi aman diedit di layer lain.</p>
+          </div>
+        </section>
+
+        <section class="dock-section soon">
+          <h2 class="dock-title"><i class="fa-solid fa-swatchbook"></i> Material <kbd>Segera</kbd></h2>
+          <div class="dock-body"><p class="empty-note">Warna dan tekstur per dinding, lantai, dan atap.</p></div>
+        </section>
+
+        <section class="dock-section soon">
+          <h2 class="dock-title"><i class="fa-solid fa-shapes"></i> Komponen <kbd>Segera</kbd></h2>
+          <div class="dock-body"><p class="empty-note">Pustaka objek dan impor model 3D.</p></div>
+        </section>
+      </aside>
+
+      <footer id="statusbar" class="app-status hide-in-tour">
+        <span id="status-text" class="only-3d status-msg"></span>
+        <span id="editor-hint" class="only-2d status-msg"></span>
+        <span class="status-spacer"></span>
+        <span class="status-chip"><i class="fa-solid fa-ruler-horizontal"></i> Satuan: meter</span>
+        <span id="status-cursor" class="only-2d status-chip font-mono">X —  Z —</span>
+        <span class="status-chip"><i class="fa-solid fa-magnet"></i> Snap 10 cm</span>
+      </footer>
+    </div>
+
+    <div class="only-tour fixed top-1/2 left-1/2 w-1.5 h-1.5 -ml-[3px] -mt-[3px] rounded-full bg-white/60 z-20 pointer-events-none"></div>
+    <div id="tour-hud" class="only-tour fixed top-5 left-1/2 -translate-x-1/2 z-30 glass-panel rounded-2xl px-5 py-3 items-center gap-4 text-xs">
+      <i class="fa-solid fa-person-walking text-emerald-400 text-lg"></i>
+      <div>
+        <div class="text-[10px] uppercase tracking-wider text-emerald-400 font-semibold">Mode Tour</div>
+        <div id="tour-room" class="text-sm font-bold text-white">&nbsp;</div>
+        <div class="text-slate-400 mt-0.5">W A S D / panah: jalan · seret mouse: lihat · Shift: lari</div>
+      </div>
+      <button id="btn-tour-exit" class="ml-2 bg-white/10 hover:bg-white/15 text-white px-3 py-2 rounded-lg font-medium transition">Keluar (Esc)</button>
+    </div>
+
+    <div id="toast" class="fixed bottom-12 left-1/2 -translate-x-1/2 z-40 px-4 py-2 rounded-xl text-white text-xs font-medium transition-opacity duration-300 opacity-0 pointer-events-none"></div>
+
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>

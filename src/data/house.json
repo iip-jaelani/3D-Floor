@@ -1,0 +1,331 @@
+{
+  "name": "Rumah Saya",
+  "wallHeight": 2.8,
+  "wallThickness": 0.12,
+  "wallColor": "#e5e0d8",
+  "floors": [
+    {
+      "id": "floor-1",
+      "name": "Lantai 1",
+      "level": 0,
+      "rooms": [
+        {
+          "id": "room-1",
+          "name": "Ruang Tamu",
+          "floor": "oak",
+          "polygon": [
+            [
+              -2.88,
+              -2.48
+            ],
+            [
+              2.88,
+              -2.48
+            ],
+            [
+              2.88,
+              2.48
+            ],
+            [
+              -2.88,
+              2.48
+            ]
+          ]
+        },
+        {
+          "id": "room-2",
+          "name": "Dapur",
+          "floor": "marble",
+          "polygon": [
+            [
+              2.88,
+              -2.48
+            ],
+            [
+              5.88,
+              -2.48
+            ],
+            [
+              5.88,
+              0.12
+            ],
+            [
+              2.88,
+              0.12
+            ]
+          ]
+        }
+      ],
+      "walls": [
+        {
+          "id": "wall-1",
+          "a": [
+            -2.88,
+            -2.48
+          ],
+          "b": [
+            2.88,
+            -2.48
+          ]
+        },
+        {
+          "id": "wall-2",
+          "a": [
+            2.88,
+            -2.48
+          ],
+          "b": [
+            2.88,
+            0.12
+          ]
+        },
+        {
+          "id": "wall-3",
+          "a": [
+            2.88,
+            0.12
+          ],
+          "b": [
+            2.88,
+            2.48
+          ]
+        },
+        {
+          "id": "wall-4",
+          "a": [
+            2.88,
+            2.48
+          ],
+          "b": [
+            -2.88,
+            2.48
+          ]
+        },
+        {
+          "id": "wall-5",
+          "a": [
+            -2.88,
+            2.48
+          ],
+          "b": [
+            -2.88,
+            -2.48
+          ]
+        },
+        {
+          "id": "wall-6",
+          "a": [
+            2.88,
+            -2.48
+          ],
+          "b": [
+            5.88,
+            -2.48
+          ]
+        },
+        {
+          "id": "wall-7",
+          "a": [
+            5.88,
+            -2.48
+          ],
+          "b": [
+            5.88,
+            0.12
+          ]
+        },
+        {
+          "id": "wall-8",
+          "a": [
+            5.88,
+            0.12
+          ],
+          "b": [
+            2.88,
+            0.12
+          ]
+        }
+      ],
+      "openings": [
+        {
+          "id": "opening-1",
+          "wallId": "wall-5",
+          "type": "window",
+          "offset": 2.48,
+          "width": 3.0,
+          "height": 1.7,
+          "sill": 0.7
+        },
+        {
+          "id": "opening-2",
+          "wallId": "wall-1",
+          "type": "window",
+          "offset": 4.68,
+          "width": 1.2,
+          "height": 1.9,
+          "sill": 0.5
+        },
+        {
+          "id": "opening-3",
+          "wallId": "wall-2",
+          "type": "door",
+          "offset": 1.3,
+          "width": 0.9,
+          "height": 2.1,
+          "sill": 0
+        },
+        {
+          "id": "opening-4",
+          "wallId": "wall-4",
+          "type": "door",
+          "offset": 4.9,
+          "width": 0.9,
+          "height": 2.1,
+          "sill": 0
+        }
+      ],
+      "decor": {
+        "curtains": [
+          {
+            "id": "curtain-back",
+            "position": [
+              -2.71,
+              0.03,
+              -1.55
+            ],
+            "rotation": 90,
+            "width": 0.95,
+            "height": 2.42,
+            "color": "#78716c",
+            "tieback": true,
+            "group": "gorden-jendela-kiri"
+          },
+          {
+            "id": "curtain-front",
+            "position": [
+              -2.71,
+              0.03,
+              1.55
+            ],
+            "rotation": 90,
+            "width": 0.95,
+            "height": 2.42,
+            "color": "#78716c",
+            "tieback": true,
+            "group": "gorden-jendela-kiri"
+          },
+          {
+            "id": "sheer",
+            "position": [
+              -2.79,
+              0.03,
+              0
+            ],
+            "rotation": 90,
+            "width": 3.0,
+            "height": 2.35,
+            "color": "#f5f1ea",
+            "sheer": true,
+            "group": "gorden-jendela-kiri"
+          }
+        ],
+        "rods": [
+          {
+            "id": "rod-left",
+            "position": [
+              -2.71,
+              2.48,
+              0
+            ],
+            "rotation": 90,
+            "length": 4.1,
+            "group": "gorden-jendela-kiri"
+          }
+        ],
+        "rugs": [
+          {
+            "id": "rug-center",
+            "size": [
+              3.4,
+              0.02,
+              2.7
+            ],
+            "position": [
+              -0.15,
+              0.01,
+              0.15
+            ],
+            "color": "#9ca3af",
+            "group": "karpet-ruang-tamu"
+          }
+        ]
+      }
+    }
+  ],
+  "furniture": [
+    {
+      "id": "sofa",
+      "type": "l-sofa",
+      "position": [
+        -1.4375,
+        0.25
+      ],
+      "rotation": 0,
+      "floor": "floor-1"
+    },
+    {
+      "id": "coffee-table",
+      "type": "coffee-table",
+      "position": [
+        -0.1,
+        0.05
+      ],
+      "rotation": 0,
+      "floor": "floor-1"
+    },
+    {
+      "id": "tv-console",
+      "type": "tv-console",
+      "position": [
+        0.1,
+        -2.12
+      ],
+      "rotation": 0,
+      "floor": "floor-1"
+    },
+    {
+      "id": "armchair",
+      "type": "armchair",
+      "position": [
+        1.45,
+        0.35
+      ],
+      "rotation": -129.6,
+      "floor": "floor-1"
+    },
+    {
+      "id": "plant",
+      "type": "plant",
+      "position": [
+        -2.25,
+        -1.9
+      ],
+      "rotation": 0,
+      "floor": "floor-1"
+    }
+  ],
+  "dimensions": [
+    {
+      "from": "coffee-table",
+      "to": "tv-console"
+    },
+    {
+      "from": "coffee-table",
+      "to": "armchair"
+    },
+    {
+      "from": "sofa",
+      "to": "coffee-table"
+    }
+  ]
+}

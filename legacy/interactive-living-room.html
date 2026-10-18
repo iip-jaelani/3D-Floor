@@ -1,0 +1,1057 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive 3D Living Room Floor Plan</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body { margin: 0; overflow: hidden; background-color: #1a1c20; font-family: 'Inter', system-ui, sans-serif; user-select: none; }
+        #canvas-container { width: 100vw; height: 100vh; display: block; }
+        .glass-panel {
+            background: rgba(28, 30, 36, 0.82);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.45);
+        }
+        .tool-btn {
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .tool-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateY(-2px);
+        }
+        .tool-btn.active {
+            background: rgba(56, 189, 248, 0.2);
+            border-color: #38bdf8;
+            color: #38bdf8;
+        }
+        .color-swatch {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: transform 0.15s ease, border-color 0.15s ease;
+            border: 2px solid rgba(255,255,255,0.2);
+        }
+        .color-swatch:hover { transform: scale(1.15); }
+        .color-swatch.selected { border-color: #38bdf8; transform: scale(1.15); box-shadow: 0 0 10px rgba(56,189,248,0.5); }
+        
+        /* Custom Tooltip / Label 3D */
+        .dim-label {
+            position: absolute;
+            background: rgba(15, 23, 42, 0.85);
+            color: #38bdf8;
+            padding: 3px 8px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 600;
+            pointer-events: none;
+            border: 1px solid rgba(56, 189, 248, 0.4);
+            white-space: nowrap;
+            transform: translate(-50%, -50%);
+            font-family: monospace;
+            z-index: 10;
+        }
+    </style>
+    <!-- Import Map for Three.js -->
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+                "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+            }
+        }
+    </script>
+</head>
+<body class="text-slate-100">
+
+    <!-- 3D Canvas Container -->
+    <div id="canvas-container"></div>
+
+    <!-- Dimension Labels Container -->
+    <div id="labels-container"></div>
+
+    <!-- Top Header / Status Bar -->
+    <div class="fixed top-5 left-5 right-5 flex justify-between items-start pointer-events-none z-20">
+        <!-- Brand & Selected Item Info -->
+        <div class="glass-panel px-5 py-3.5 rounded-2xl pointer-events-auto flex items-center gap-4">
+            <div class="w-10 h-10 rounded-xl bg-sky-500/20 border border-sky-400/40 flex items-center justify-center text-sky-400">
+                <i class="fa-solid fa-cube text-lg"></i>
+            </div>
+            <div>
+                <h1 class="text-sm font-bold tracking-wide text-white flex items-center gap-2">
+                    3D Living Room Studio
+                    <span class="text-[10px] bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 px-2 py-0.5 rounded-full font-medium">Interactive</span>
+                </h1>
+                <p id="status-text" class="text-xs text-slate-400 mt-0.5">Klik furnitur untuk memilih, drag untuk memindahkan</p>
+            </div>
+        </div>
+
+        <!-- Top Right Controls (Camera & Environment) -->
+        <div class="flex gap-2.5 pointer-events-auto">
+            <button id="btn-dimensions" class="glass-panel px-4 py-2.5 rounded-xl text-xs font-medium flex items-center gap-2 tool-btn active border border-transparent">
+                <i class="fa-solid fa-ruler-combined"></i>
+                <span>Ukuran (m)</span>
+            </button>
+            <button id="btn-daynight" class="glass-panel px-4 py-2.5 rounded-xl text-xs font-medium flex items-center gap-2 tool-btn border border-transparent">
+                <i class="fa-solid fa-sun text-amber-400" id="icon-daynight"></i>
+                <span id="text-daynight">Siang</span>
+            </button>
+            <button id="btn-reset-cam" class="glass-panel px-4 py-2.5 rounded-xl text-xs font-medium flex items-center gap-2 tool-btn border border-transparent" title="Reset Sudut Kamera">
+                <i class="fa-solid fa-video"></i>
+                <span>3D View</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Right Sidebar (Selected Object Inspector) -->
+    <div id="inspector-panel" class="fixed right-5 top-24 glass-panel p-4 rounded-2xl w-64 z-20 transition-all duration-300 opacity-0 translate-x-10 pointer-events-none">
+        <div class="flex justify-between items-center border-b border-white/10 pb-3 mb-3">
+            <div>
+                <span class="text-[10px] uppercase tracking-wider text-sky-400 font-semibold">Objek Terpilih</span>
+                <h3 id="selected-name" class="text-sm font-bold text-white">Sofa L-Shape</h3>
+            </div>
+            <button id="btn-deselect" class="text-slate-400 hover:text-white text-xs p-1">
+                <i class="fa-solid fa-xmark text-sm"></i>
+            </button>
+        </div>
+
+        <!-- Position & Rotation -->
+        <div class="space-y-3 text-xs">
+            <div class="flex justify-between items-center text-slate-300">
+                <span>Posisi (X, Z):</span>
+                <span id="selected-pos" class="font-mono text-sky-300">0.0m, 0.0m</span>
+            </div>
+            <div class="flex justify-between items-center text-slate-300">
+                <span>Rotasi:</span>
+                <span id="selected-rot" class="font-mono text-emerald-300">0°</span>
+            </div>
+
+            <!-- Quick Rotate Slider -->
+            <div class="pt-1">
+                <label class="text-[11px] text-slate-400 block mb-1">Putar Halus (0° - 360°)</label>
+                <input id="rot-slider" type="range" min="0" max="360" value="0" class="w-full accent-sky-400 cursor-pointer h-1.5 bg-slate-700 rounded-lg">
+            </div>
+
+            <!-- Material Color Swatches -->
+            <div class="pt-2 border-t border-white/10">
+                <label class="text-[11px] text-slate-400 block mb-2">Ganti Warna / Material:</label>
+                <div class="flex gap-2 flex-wrap" id="material-swatches">
+                    <div class="color-swatch" style="background: #9c8f84;" data-color="#9c8f84" title="Warm Taupe"></div>
+                    <div class="color-swatch" style="background: #475569;" data-color="#475569" title="Slate Blue"></div>
+                    <div class="color-swatch" style="background: #334155;" data-color="#334155" title="Charcoal Dark"></div>
+                    <div class="color-swatch" style="background: #d6d3d1;" data-color="#d6d3d1" title="Cream White"></div>
+                    <div class="color-swatch" style="background: #065f46;" data-color="#065f46" title="Emerald Green"></div>
+                    <div class="color-swatch" style="background: #9a3412;" data-color="#9a3412" title="Terracotta Leather"></div>
+                </div>
+            </div>
+
+            <!-- Delete Button -->
+            <div class="pt-3 border-t border-white/10 flex gap-2">
+                <button id="btn-duplicate" class="flex-1 bg-white/10 hover:bg-white/15 text-white py-2 rounded-lg font-medium transition flex items-center justify-center gap-1.5">
+                    <i class="fa-regular fa-copy"></i> Duplikat
+                </button>
+                <button id="btn-delete" class="flex-1 bg-rose-500/20 hover:bg-rose-500/30 text-rose-300 border border-rose-500/30 py-2 rounded-lg font-medium transition flex items-center justify-center gap-1.5">
+                    <i class="fa-regular fa-trash-can"></i> Hapus
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pop-up Catalog Modal -->
+    <div id="catalog-modal" class="fixed bottom-28 left-1/2 -translate-x-1/2 glass-panel p-4 rounded-2xl z-20 hidden w-[480px] max-w-[92vw]">
+        <div class="flex justify-between items-center mb-3 pb-2 border-b border-white/10">
+            <span class="text-xs font-bold text-white flex items-center gap-2">
+                <i class="fa-solid fa-couch text-sky-400"></i> Tambah Furnitur ke Ruangan
+            </span>
+            <button id="close-catalog" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        <div class="grid grid-cols-4 gap-2.5 text-center text-xs">
+            <button class="add-item-btn p-3 rounded-xl bg-white/5 hover:bg-sky-500/20 border border-white/10 hover:border-sky-400/50 transition flex flex-col items-center gap-2" data-type="armchair">
+                <i class="fa-solid fa-chair text-xl text-amber-300"></i>
+                <span>Armchair</span>
+            </button>
+            <button class="add-item-btn p-3 rounded-xl bg-white/5 hover:bg-sky-500/20 border border-white/10 hover:border-sky-400/50 transition flex flex-col items-center gap-2" data-type="table">
+                <i class="fa-solid fa-table text-xl text-sky-300"></i>
+                <span>Meja Kopi</span>
+            </button>
+            <button class="add-item-btn p-3 rounded-xl bg-white/5 hover:bg-sky-500/20 border border-white/10 hover:border-sky-400/50 transition flex flex-col items-center gap-2" data-type="plant">
+                <i class="fa-solid fa-seedling text-xl text-emerald-400"></i>
+                <span>Tanaman</span>
+            </button>
+            <button class="add-item-btn p-3 rounded-xl bg-white/5 hover:bg-sky-500/20 border border-white/10 hover:border-sky-400/50 transition flex flex-col items-center gap-2" data-type="lamp">
+                <i class="fa-regular fa-lightbulb text-xl text-yellow-300"></i>
+                <span>Standing Lamp</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Pop-up Wall/Floor Style Modal -->
+    <div id="room-style-modal" class="fixed bottom-28 left-1/2 -translate-x-1/2 glass-panel p-4 rounded-2xl z-20 hidden w-[380px] max-w-[92vw]">
+        <div class="flex justify-between items-center mb-3 pb-2 border-b border-white/10">
+            <span class="text-xs font-bold text-white flex items-center gap-2">
+                <i class="fa-solid fa-paint-roller text-sky-400"></i> Kustomisasi Dinding & Lantai
+            </span>
+            <button id="close-room-style" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        <div class="space-y-3 text-xs">
+            <div>
+                <span class="text-slate-400 block mb-1.5">Motif Lantai Kayu / Marmer:</span>
+                <div class="grid grid-cols-3 gap-2">
+                    <button class="floor-btn py-2 px-3 rounded-lg bg-amber-900/40 border border-amber-600/40 text-amber-200 hover:bg-amber-900/60" data-floor="oak">Warm Oak</button>
+                    <button class="floor-btn py-2 px-3 rounded-lg bg-stone-800 border border-stone-600 text-stone-300 hover:bg-stone-700" data-floor="walnut">Dark Walnut</button>
+                    <button class="floor-btn py-2 px-3 rounded-lg bg-slate-200 text-slate-800 font-medium hover:bg-white" data-floor="marble">Light Tile</button>
+                </div>
+            </div>
+            <div>
+                <span class="text-slate-400 block mb-1.5">Warna Dinding:</span>
+                <div class="grid grid-cols-4 gap-2">
+                    <button class="wall-btn py-1.5 rounded-lg border border-white/20 text-slate-800 font-medium" style="background:#e5e0d8" data-wall="#e5e0d8">Cream</button>
+                    <button class="wall-btn py-1.5 rounded-lg border border-white/20 text-slate-800 font-medium" style="background:#cbd5e1" data-wall="#cbd5e1">Cool Grey</button>
+                    <button class="wall-btn py-1.5 rounded-lg border border-white/20 text-white font-medium" style="background:#334155" data-wall="#334155">Navy Slate</button>
+                    <button class="wall-btn py-1.5 rounded-lg border border-white/20 text-slate-800 font-medium" style="background:#d1fae5" data-wall="#d1fae5">Sage</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bottom Floating Dock (Exactly like the reference image) -->
+    <div class="fixed bottom-6 left-1/2 -translate-x-1/2 glass-panel px-5 py-2.5 rounded-2xl flex items-center gap-2 sm:gap-5 z-20">
+        <button id="dock-rotate" class="tool-btn flex flex-col items-center gap-1.5 px-3 py-2 rounded-xl border border-transparent text-slate-200">
+            <i class="fa-solid fa-rotate-right text-lg"></i>
+            <span class="text-[11px] font-medium">Rotate 45°</span>
+        </button>
+
+        <button id="dock-move" class="tool-btn active flex flex-col items-center gap-1.5 px-3 py-2 rounded-xl border border-transparent text-slate-200">
+            <i class="fa-solid fa-arrows-up-down-left-right text-lg"></i>
+            <span class="text-[11px] font-medium">Move Mode</span>
+        </button>
+
+        <button id="dock-material" class="tool-btn flex flex-col items-center gap-1.5 px-3 py-2 rounded-xl border border-transparent text-slate-200">
+            <div class="w-5 h-5 rounded-full bg-gradient-to-tr from-stone-400 to-amber-200 border border-white/50"></div>
+            <span class="text-[11px] font-medium">Change Material</span>
+        </button>
+
+        <button id="dock-catalog" class="tool-btn flex flex-col items-center gap-1.5 px-3 py-2 rounded-xl border border-transparent text-slate-200">
+            <i class="fa-solid fa-couch text-lg"></i>
+            <span class="text-[11px] font-medium">Furniture Catalog</span>
+        </button>
+
+        <button id="dock-walls" class="tool-btn flex flex-col items-center gap-1.5 px-3 py-2 rounded-xl border border-transparent text-slate-200">
+            <i class="fa-regular fa-map text-lg"></i>
+            <span class="text-[11px] font-medium">Walls/Floor</span>
+        </button>
+    </div>
+
+    <!-- Main Three.js Application Logic -->
+    <script type="module">
+        import * as THREE from 'three';
+        import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+        // --- 1. SCENE, CAMERA & RENDERER SETUP ---
+        const container = document.getElementById('canvas-container');
+        const labelsContainer = document.getElementById('labels-container');
+
+        const scene = new THREE.Scene();
+        scene.background = new THREE.Color('#202227');
+
+        const camera = new THREE.PerspectiveCamera(40, window.innerWidth / window.innerHeight, 0.1, 100);
+        camera.position.set(6.5, 6.2, 7.5);
+
+        const renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: "high-performance" });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        renderer.shadowMap.enabled = true;
+        renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+        renderer.toneMapping = THREE.ACESFilmicToneMapping;
+        renderer.toneMappingExposure = 1.1;
+        container.appendChild(renderer.domElement);
+
+        const controls = new OrbitControls(camera, renderer.domElement);
+        controls.enableDamping = true;
+        controls.dampingFactor = 0.06;
+        controls.maxPolarAngle = Math.PI / 2 - 0.05; // Jangan tembus bawah lantai
+        controls.minDistance = 3;
+        controls.maxDistance = 18;
+        controls.target.set(0, 0.6, 0);
+
+        // --- 2. LIGHTING SETUP ---
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.65);
+        scene.add(ambientLight);
+
+        const sunLight = new THREE.DirectionalLight(0xfff5e6, 2.2);
+        sunLight.position.set(-6, 9, 4);
+        sunLight.castShadow = true;
+        sunLight.shadow.mapSize.width = 2048;
+        sunLight.shadow.mapSize.height = 2048;
+        sunLight.shadow.camera.near = 0.5;
+        sunLight.shadow.camera.far = 25;
+        const d = 5;
+        sunLight.shadow.camera.left = -d;
+        sunLight.shadow.camera.right = d;
+        sunLight.shadow.camera.top = d;
+        sunLight.shadow.camera.bottom = -d;
+        sunLight.shadow.bias = -0.0005;
+        scene.add(sunLight);
+
+        const warmRoomLight = new THREE.PointLight(0xffaa55, 0.5, 10);
+        warmRoomLight.position.set(0, 3, 0);
+        scene.add(warmRoomLight);
+
+        // --- 3. PROCEDURAL TEXTURES ---
+        function createWoodTexture(baseHex, stripeHex) {
+            const canvas = document.createElement('canvas');
+            canvas.width = 512;
+            canvas.height = 512;
+            const ctx = canvas.getContext('2d');
+            ctx.fillStyle = baseHex;
+            ctx.fillRect(0, 0, 512, 512);
+
+            // Wood grain & planks
+            ctx.strokeStyle = stripeHex;
+            ctx.lineWidth = 2;
+            const planks = 8;
+            const plankH = 512 / planks;
+            for (let i = 0; i < planks; i++) {
+                ctx.beginPath();
+                ctx.moveTo(0, i * plankH);
+                ctx.lineTo(512, i * plankH);
+                ctx.stroke();
+
+                // Vertical joint lines
+                const jointX = ((i * 173) % 400) + 50;
+                ctx.beginPath();
+                ctx.moveTo(jointX, i * plankH);
+                ctx.lineTo(jointX, (i + 1) * plankH);
+                ctx.stroke();
+
+                // Subtle wood streaks
+                ctx.fillStyle = stripeHex;
+                ctx.globalAlpha = 0.12;
+                for (let s = 0; s < 12; s++) {
+                    const sy = i * plankH + Math.random() * plankH;
+                    ctx.fillRect(0, sy, 512, Math.random() * 4);
+                }
+                ctx.globalAlpha = 1.0;
+            }
+            const tex = new THREE.CanvasTexture(canvas);
+            tex.wrapS = THREE.RepeatWrapping;
+            tex.wrapT = THREE.RepeatWrapping;
+            tex.repeat.set(3, 3);
+            return tex;
+        }
+
+        const woodTextures = {
+            oak: createWoodTexture('#8c6239', '#593a1e'),
+            walnut: createWoodTexture('#4a3525', '#261910'),
+            marble: createWoodTexture('#e2e8f0', '#cbd5e1')
+        };
+
+        // --- 4. BUILD ROOM ARCHITECTURE (Cutaway Diorama) ---
+        const ROOM_W = 6.0;
+        const ROOM_D = 5.2;
+        const WALL_H = 2.8;
+        const WALL_T = 0.18;
+
+        const roomGroup = new THREE.Group();
+        scene.add(roomGroup);
+
+        // Floor
+        const floorGeo = new THREE.BoxGeometry(ROOM_W, 0.16, ROOM_D);
+        const floorMat = new THREE.MeshStandardMaterial({
+            map: woodTextures.oak,
+            roughness: 0.4,
+            metalness: 0.05
+        });
+        const floorMesh = new THREE.Mesh(floorGeo, floorMat);
+        floorMesh.position.y = -0.08;
+        floorMesh.receiveShadow = true;
+        roomGroup.add(floorMesh);
+
+        // Wall Material & Black Cutaway Cap Material
+        const wallMat = new THREE.MeshStandardMaterial({ color: '#e5e0d8', roughness: 0.85 });
+        const wallCapMat = new THREE.MeshStandardMaterial({ color: '#18181b', roughness: 0.5 });
+
+        function createWallSection(w, h, d, x, y, z) {
+            const group = new THREE.Group();
+            const body = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), wallMat);
+            body.castShadow = true;
+            body.receiveShadow = true;
+            group.add(body);
+
+            // Top dark border cap like architectural rendering
+            const cap = new THREE.Mesh(new THREE.BoxGeometry(w + 0.005, 0.05, d + 0.005), wallCapMat);
+            cap.position.y = h / 2 + 0.025;
+            group.add(cap);
+
+            group.position.set(x, y, z);
+            roomGroup.add(group);
+            return group;
+        }
+
+        // Left Wall (-X) with large window cutout
+        createWallSection(WALL_T, 0.7, ROOM_D, -ROOM_W/2 + WALL_T/2, 0.35, 0); // Bottom sill
+        createWallSection(WALL_T, 0.4, ROOM_D, -ROOM_W/2 + WALL_T/2, WALL_H - 0.2, 0); // Top lintel
+        createWallSection(WALL_T, 1.7, 1.1, -ROOM_W/2 + WALL_T/2, 0.7 + 0.85, -ROOM_D/2 + 0.55); // Back pillar
+        createWallSection(WALL_T, 1.7, 1.1, -ROOM_W/2 + WALL_T/2, 0.7 + 0.85, ROOM_D/2 - 0.55); // Front pillar
+
+        // Window Frame & Glass on Left Wall
+        const winFrameMat = new THREE.MeshStandardMaterial({ color: '#27272a', roughness: 0.4 });
+        const glassMat = new THREE.MeshPhysicalMaterial({ color: '#ffffff', transparent: true, opacity: 0.3, roughness: 0.1, transmission: 0.6 });
+        const leftWindowGlass = new THREE.Mesh(new THREE.BoxGeometry(0.04, 1.7, 3.0), glassMat);
+        leftWindowGlass.position.set(-ROOM_W/2 + WALL_T/2, 1.55, 0);
+        roomGroup.add(leftWindowGlass);
+
+        // Curtains on Left Wall
+        const curtainMat = new THREE.MeshStandardMaterial({ color: '#78716c', roughness: 0.9 });
+        const curtainL = new THREE.Mesh(new THREE.BoxGeometry(0.18, 2.35, 0.55), curtainMat);
+        curtainL.position.set(-ROOM_W/2 + WALL_T + 0.08, 1.2, -1.55);
+        curtainL.castShadow = true;
+        roomGroup.add(curtainL);
+
+        const curtainR = new THREE.Mesh(new THREE.BoxGeometry(0.18, 2.35, 0.55), curtainMat);
+        curtainR.position.set(-ROOM_W/2 + WALL_T + 0.08, 1.2, 1.55);
+        curtainR.castShadow = true;
+        roomGroup.add(curtainR);
+
+        // Back Wall (-Z) with right window cutout
+        createWallSection(4.2, WALL_H, WALL_T, -0.9, WALL_H/2, -ROOM_D/2 + WALL_T/2); // Main TV wall section
+        createWallSection(0.6, WALL_H, WALL_T, ROOM_W/2 - 0.3, WALL_H/2, -ROOM_D/2 + WALL_T/2); // Far right corner
+        createWallSection(1.2, 0.5, WALL_T, 1.8, 0.25, -ROOM_D/2 + WALL_T/2); // Window bottom
+        createWallSection(1.2, 0.4, WALL_T, 1.8, WALL_H - 0.2, -ROOM_D/2 + WALL_T/2); // Window top
+        const backGlass = new THREE.Mesh(new THREE.BoxGeometry(1.2, 1.9, 0.04), glassMat);
+        backGlass.position.set(1.8, 1.45, -ROOM_D/2 + WALL_T/2);
+        roomGroup.add(backGlass);
+
+        // Low Cutaway Front/Right Walls (Like the reference image)
+        createWallSection(WALL_T, 0.45, 1.6, ROOM_W/2 - WALL_T/2, 0.225, -ROOM_D/2 + 0.8);
+        createWallSection(1.5, 0.45, WALL_T, -ROOM_W/2 + 0.75, 0.225, ROOM_D/2 - WALL_T/2);
+
+        // Area Rug (Karpet Tengah)
+        const rugGeo = new THREE.BoxGeometry(3.4, 0.02, 2.7);
+        const rugMat = new THREE.MeshStandardMaterial({ color: '#9ca3af', roughness: 0.95 });
+        const rugMesh = new THREE.Mesh(rugGeo, rugMat);
+        rugMesh.position.set(-0.15, 0.01, 0.15);
+        rugMesh.receiveShadow = true;
+        roomGroup.add(rugMesh);
+
+        // --- 5. INTERACTIVE FURNITURE BUILDERS ---
+        const furnitureList = [];
+        const furnitureGroup = new THREE.Group();
+        scene.add(furnitureGroup);
+
+        // Helper to register interactive furniture
+        function registerFurniture(group, name, sizeVec, colorSwatchesTarget) {
+            group.userData = {
+                isFurniture: true,
+                name: name,
+                size: sizeVec,
+                colorMeshes: colorSwatchesTarget || []
+            };
+            // Create cyan selection outline box (hidden by default)
+            const boxGeo = new THREE.BoxGeometry(sizeVec.x + 0.08, sizeVec.y + 0.08, sizeVec.z + 0.08);
+            const edges = new THREE.EdgesGeometry(boxGeo);
+            const lineMat = new THREE.LineBasicMaterial({ color: 0x38bdf8, linewidth: 2 });
+            const outline = new THREE.LineSegments(edges, lineMat);
+            outline.position.y = sizeVec.y / 2;
+            outline.visible = false;
+            group.add(outline);
+            group.userData.outline = outline;
+
+            furnitureGroup.add(group);
+            furnitureList.push(group);
+            return group;
+        }
+
+        // 5A. L-Shape Sectional Sofa
+        function createLShapeSofa() {
+            const group = new THREE.Group();
+            const fabricMat = new THREE.MeshStandardMaterial({ color: '#9c8f84', roughness: 0.85 });
+            const cushionMat = new THREE.MeshStandardMaterial({ color: '#aba096', roughness: 0.8 });
+            const colorTargets = [];
+
+            function addPart(w, h, d, x, y, z, mat = fabricMat) {
+                const m = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), mat);
+                m.position.set(x, y, z);
+                m.castShadow = true;
+                m.receiveShadow = true;
+                group.add(m);
+                if (mat === fabricMat) colorTargets.push(m);
+                return m;
+            }
+
+            // Main Base along Left Wall (-X)
+            addPart(0.95, 0.4, 2.8, -0.55, 0.2, 0);
+            // Chaise/Extension along Front (+Z)
+            addPart(1.3, 0.4, 0.95, 0.55, 0.2, 0.925);
+            // Backrest Left
+            addPart(0.22, 0.48, 2.8, -0.92, 0.64, 0);
+            // Backrest Front
+            addPart(2.05, 0.48, 0.22, 0.17, 0.64, 1.29);
+            // Armrest Back
+            addPart(0.95, 0.35, 0.2, -0.55, 0.55, -1.3);
+            // Armrest Right
+            addPart(0.2, 0.35, 0.95, 1.15, 0.55, 0.925);
+
+            // Throw Pillows
+            addPart(0.18, 0.32, 0.38, -0.72, 0.58, -0.9, cushionMat);
+            addPart(0.18, 0.32, 0.38, -0.72, 0.58, 0.1, cushionMat);
+            addPart(0.38, 0.32, 0.18, 0.4, 0.58, 1.08, cushionMat);
+
+            group.position.set(-1.55, 0, 0.25);
+            return registerFurniture(group, "Sofa L-Shape Modular", new THREE.Vector3(2.4, 0.9, 2.85), colorTargets);
+        }
+
+        // 5B. Modern Coffee Table
+        function createCoffeeTable(x = -0.1, z = 0.05) {
+            const group = new THREE.Group();
+            const topMat = new THREE.MeshStandardMaterial({ color: '#57534e', roughness: 0.3, metalness: 0.2 });
+            const frameMat = new THREE.MeshStandardMaterial({ color: '#1c1917', roughness: 0.4, metalness: 0.8 });
+
+            // Top & Bottom Shelf
+            const top = new THREE.Mesh(new THREE.BoxGeometry(1.2, 0.05, 0.7), topMat);
+            top.position.y = 0.42;
+            top.castShadow = true;
+            top.receiveShadow = true;
+            group.add(top);
+
+            const shelf = new THREE.Mesh(new THREE.BoxGeometry(1.16, 0.03, 0.66), frameMat);
+            shelf.position.y = 0.14;
+            shelf.castShadow = true;
+            group.add(shelf);
+
+            // 4 Thin Metal Legs
+            [[-0.56, -0.31], [0.56, -0.31], [-0.56, 0.31], [0.56, 0.31]].forEach(([lx, lz]) => {
+                const leg = new THREE.Mesh(new THREE.BoxGeometry(0.03, 0.42, 0.03), frameMat);
+                leg.position.set(lx, 0.21, lz);
+                leg.castShadow = true;
+                group.add(leg);
+            });
+
+            // Coffee Table Book & Small Vase
+            const book = new THREE.Mesh(new THREE.BoxGeometry(0.28, 0.04, 0.22), new THREE.MeshStandardMaterial({ color: '#e7e5e4' }));
+            book.position.set(-0.22, 0.465, 0.05);
+            book.rotation.y = 0.2;
+            group.add(book);
+
+            const vase = new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.07, 0.16, 16), new THREE.MeshStandardMaterial({ color: '#292524', roughness: 0.2 }));
+            vase.position.set(0.22, 0.52, -0.05);
+            group.add(vase);
+
+            group.position.set(x, 0, z);
+            return registerFurniture(group, "Meja Kopi Minimalis", new THREE.Vector3(1.2, 0.55, 0.7), [top]);
+        }
+
+        // 5C. TV Console & Smart TV
+        function createTVConsole() {
+            const group = new THREE.Group();
+            const cabMat = new THREE.MeshStandardMaterial({ color: '#6b635b', roughness: 0.5 });
+            const screenMat = new THREE.MeshStandardMaterial({ color: '#09090b', roughness: 0.15, metalness: 0.8 });
+
+            // Console Cabinet
+            const cab = new THREE.Mesh(new THREE.BoxGeometry(2.1, 0.42, 0.48), cabMat);
+            cab.position.y = 0.31;
+            cab.castShadow = true;
+            cab.receiveShadow = true;
+            group.add(cab);
+
+            // TV Panel
+            const tv = new THREE.Mesh(new THREE.BoxGeometry(1.5, 0.88, 0.04), screenMat);
+            tv.position.set(0, 1.08, -0.05);
+            tv.castShadow = true;
+            group.add(tv);
+
+            // TV Stand Neck
+            const stand = new THREE.Mesh(new THREE.CylinderGeometry(0.04, 0.15, 0.18, 16), screenMat);
+            stand.position.set(0, 0.58, -0.05);
+            group.add(stand);
+
+            group.position.set(0.1, 0, -2.12);
+            return registerFurniture(group, "TV & Meja Konsol", new THREE.Vector3(2.1, 1.55, 0.5), [cab]);
+        }
+
+        // 5D. Accent Armchair
+        function createArmchair(x = 1.45, z = 0.35, rotY = -Math.PI * 0.72) {
+            const group = new THREE.Group();
+            const cushionMat = new THREE.MeshStandardMaterial({ color: '#b8afa6', roughness: 0.8 });
+            const woodMat = new THREE.MeshStandardMaterial({ color: '#3e2723', roughness: 0.5 });
+
+            // Seat & Back
+            const seat = new THREE.Mesh(new THREE.BoxGeometry(0.75, 0.16, 0.75), cushionMat);
+            seat.position.y = 0.38;
+            seat.castShadow = true;
+            group.add(seat);
+
+            const back = new THREE.Mesh(new THREE.BoxGeometry(0.75, 0.52, 0.14), cushionMat);
+            back.position.set(0, 0.68, -0.31);
+            back.rotation.x = -0.12;
+            back.castShadow = true;
+            group.add(back);
+
+            // Wooden Armrests & Legs
+            [-0.36, 0.36].forEach(side => {
+                const arm = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.05, 0.78), woodMat);
+                arm.position.set(side, 0.56, 0);
+                arm.castShadow = true;
+                group.add(arm);
+
+                const legF = new THREE.Mesh(new THREE.CylinderGeometry(0.025, 0.018, 0.56), woodMat);
+                legF.position.set(side, 0.28, 0.32);
+                group.add(legF);
+
+                const legB = new THREE.Mesh(new THREE.CylinderGeometry(0.025, 0.018, 0.56), woodMat);
+                legB.position.set(side, 0.28, -0.32);
+                group.add(legB);
+            });
+
+            group.position.set(x, 0, z);
+            group.rotation.y = rotY;
+            return registerFurniture(group, "Kursi Armchair Kayu", new THREE.Vector3(0.82, 0.95, 0.82), [seat, back]);
+        }
+
+        // 5E. Indoor Potted Plant
+        function createPlant(x = -2.25, z = -1.9) {
+            const group = new THREE.Group();
+            const potMat = new THREE.MeshStandardMaterial({ color: '#78716c', roughness: 0.7 });
+            const leafMat = new THREE.MeshStandardMaterial({ color: '#2e6f40', roughness: 0.6 });
+
+            const pot = new THREE.Mesh(new THREE.CylinderGeometry(0.24, 0.19, 0.42, 20), potMat);
+            pot.position.y = 0.21;
+            pot.castShadow = true;
+            group.add(pot);
+
+            // Bushy Foliage Spheres
+            const positions = [
+                [0, 0.75, 0, 0.32], [-0.18, 0.95, 0.1, 0.25],
+                [0.18, 1.0, -0.1, 0.26], [0, 1.22, 0.05, 0.28],
+                [-0.12, 1.38, -0.08, 0.22]
+            ];
+            const leaves = [];
+            positions.forEach(([lx, ly, lz, r]) => {
+                const leaf = new THREE.Mesh(new THREE.DodecahedronGeometry(r, 1), leafMat);
+                leaf.position.set(lx, ly, lz);
+                leaf.castShadow = true;
+                group.add(leaf);
+                leaves.push(leaf);
+            });
+
+            group.position.set(x, 0, z);
+            return registerFurniture(group, "Tanaman Indoor Hias", new THREE.Vector3(0.65, 1.55, 0.65), [pot]);
+        }
+
+        // 5F. Standing Floor Lamp (Catalog item)
+        function createFloorLamp(x = 0, z = 0) {
+            const group = new THREE.Group();
+            const metalMat = new THREE.MeshStandardMaterial({ color: '#d4af37', metalness: 0.8, roughness: 0.2 });
+            const shadeMat = new THREE.MeshStandardMaterial({ color: '#fef3c7', emissive: '#fde68a', emissiveIntensity: 0.4 });
+
+            const base = new THREE.Mesh(new THREE.CylinderGeometry(0.22, 0.22, 0.04, 24), metalMat);
+            base.position.y = 0.02;
+            group.add(base);
+
+            const pole = new THREE.Mesh(new THREE.CylinderGeometry(0.02, 0.02, 1.45, 12), metalMat);
+            pole.position.y = 0.725;
+            pole.castShadow = true;
+            group.add(pole);
+
+            const shade = new THREE.Mesh(new THREE.CylinderGeometry(0.18, 0.26, 0.32, 24), shadeMat);
+            shade.position.y = 1.45;
+            shade.castShadow = true;
+            group.add(shade);
+
+            const bulb = new THREE.PointLight(0xffb74d, 0.8, 4);
+            bulb.position.y = 1.4;
+            group.add(bulb);
+
+            group.position.set(x, 0, z);
+            return registerFurniture(group, "Standing Floor Lamp", new THREE.Vector3(0.55, 1.65, 0.55), [shade]);
+        }
+
+        // Initialize Default Furniture matching the image
+        const sofaObj = createLShapeSofa();
+        const tableObj = createCoffeeTable();
+        const tvObj = createTVConsole();
+        const chairObj = createArmchair();
+        const plantObj = createPlant();
+
+        // --- 6. DYNAMIC DIMENSION LINES & LABELS (Like the 1.8m, 1.2m, 0.8m in image) ---
+        let showDimensions = true;
+        const dimGroup = new THREE.Group();
+        scene.add(dimGroup);
+
+        const dimLineMat = new THREE.LineDashedMaterial({ color: 0x38bdf8, dashSize: 0.1, gapSize: 0.06 });
+
+        function createDimensionLine() {
+            const geo = new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(), new THREE.Vector3()]);
+            const line = new THREE.Line(geo, dimLineMat);
+            dimGroup.add(line);
+
+            const label = document.createElement('div');
+            label.className = 'dim-label';
+            labelsContainer.appendChild(label);
+
+            return { line, label };
+        }
+
+        const dimSofaToTable = createDimensionLine();
+        const dimTableToTV = createDimensionLine();
+        const dimTableToChair = createDimensionLine();
+        const dimRoomWidth = createDimensionLine();
+
+        function updateDimensionEntry(dimObj, p1, p2, customText = null) {
+            if (!showDimensions) {
+                dimObj.line.visible = false;
+                dimObj.label.style.display = 'none';
+                return;
+            }
+            dimObj.line.visible = true;
+            dimObj.line.geometry.setFromPoints([p1, p2]);
+            dimObj.line.computeLineDistances();
+
+            const dist = p1.distanceTo(p2);
+            const mid = new THREE.Vector3().addVectors(p1, p2).multiplyScalar(0.5);
+            mid.project(camera);
+
+            if (mid.z > 1) {
+                dimObj.label.style.display = 'none';
+                return;
+            }
+
+            const x = (mid.x * 0.5 + 0.5) * window.innerWidth;
+            const y = (-(mid.y * 0.5) + 0.5) * window.innerHeight;
+
+            dimObj.label.style.display = 'block';
+            dimObj.label.style.left = `${x}px`;
+            dimObj.label.style.top = `${y}px`;
+            dimObj.label.textContent = customText || `${dist.toFixed(2)}m`;
+        }
+
+        function refreshAllDimensions() {
+            // 1. Table to TV Console
+            if (tableObj.parent && tvObj.parent) {
+                const p1 = new THREE.Vector3(tableObj.position.x, 0.05, tableObj.position.z - 0.35);
+                const p2 = new THREE.Vector3(tableObj.position.x, 0.05, tvObj.position.z + 0.25);
+                updateDimensionEntry(dimTableToTV, p1, p2);
+            } else {
+                dimTableToTV.line.visible = false; dimTableToTV.label.style.display = 'none';
+            }
+
+            // 2. Table to Armchair
+            if (tableObj.parent && chairObj.parent) {
+                const p1 = new THREE.Vector3(tableObj.position.x + 0.6, 0.05, tableObj.position.z);
+                const p2 = new THREE.Vector3(chairObj.position.x - 0.35, 0.05, chairObj.position.z);
+                updateDimensionEntry(dimTableToChair, p1, p2);
+            } else {
+                dimTableToChair.line.visible = false; dimTableToChair.label.style.display = 'none';
+            }
+
+            // 3. Sofa to Table
+            if (sofaObj.parent && tableObj.parent) {
+                const p1 = new THREE.Vector3(sofaObj.position.x + 0.45, 0.05, tableObj.position.z);
+                const p2 = new THREE.Vector3(tableObj.position.x - 0.6, 0.05, tableObj.position.z);
+                updateDimensionEntry(dimSofaToTable, p1, p2);
+            } else {
+                dimSofaToTable.line.visible = false; dimSofaToTable.label.style.display = 'none';
+            }
+
+            // 4. Outer Room Scale Reference
+            updateDimensionEntry(
+                dimRoomWidth,
+                new THREE.Vector3(-ROOM_W/2, 0.02, ROOM_D/2 + 0.35),
+                new THREE.Vector3(ROOM_W/2, 0.02, ROOM_D/2 + 0.35),
+                `Lebar Ruangan: ${ROOM_W.toFixed(1)}m`
+            );
+        }
+
+        // --- 7. RAYCASTING, SELECTION & DRAG-AND-DROP ---
+        const raycaster = new THREE.Raycaster();
+        const pointer = new THREE.Vector2();
+        const floorPlane = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0);
+        const planeIntersect = new THREE.Vector3();
+
+        let selectedObject = null;
+        let isDragging = false;
+        let dragOffset = new THREE.Vector3();
+
+        // UI Elements
+        const inspectorPanel = document.getElementById('inspector-panel');
+        const selectedNameEl = document.getElementById('selected-name');
+        const selectedPosEl = document.getElementById('selected-pos');
+        const selectedRotEl = document.getElementById('selected-rot');
+        const rotSlider = document.getElementById('rot-slider');
+        const statusText = document.getElementById('status-text');
+
+        function selectFurniture(obj) {
+            if (selectedObject && selectedObject.userData.outline) {
+                selectedObject.userData.outline.visible = false;
+            }
+            selectedObject = obj;
+
+            if (selectedObject) {
+                selectedObject.userData.outline.visible = true;
+                inspectorPanel.classList.remove('opacity-0', 'translate-x-10', 'pointer-events-none');
+                updateInspectorUI();
+                statusText.textContent = `Terpilih: ${selectedObject.userData.name} — Drag untuk geser posisi`;
+            } else {
+                inspectorPanel.classList.add('opacity-0', 'translate-x-10', 'pointer-events-none');
+                statusText.textContent = 'Klik furnitur untuk memilih, drag untuk memindahkan';
+            }
+        }
+
+        function updateInspectorUI() {
+            if (!selectedObject) return;
+            selectedNameEl.textContent = selectedObject.userData.name;
+            selectedPosEl.textContent = `${selectedObject.position.x.toFixed(2)}m, ${selectedObject.position.z.toFixed(2)}m`;
+            let deg = Math.round(THREE.MathUtils.radToDeg(selectedObject.rotation.y)) % 360;
+            if (deg < 0) deg += 360;
+            selectedRotEl.textContent = `${deg}°`;
+            rotSlider.value = deg;
+        }
+
+        function getPointerNormalized(e) {
+            pointer.x = (e.clientX / window.innerWidth) * 2 - 1;
+            pointer.y = -(e.clientY / window.innerHeight) * 2 + 1;
+        }
+
+        renderer.domElement.addEventListener('pointerdown', (e) => {
+            if (e.button !== 0) return; // Hanya klik kiri
+            getPointerNormalized(e);
+            raycaster.setFromCamera(pointer, camera);
+
+            const intersects = raycaster.intersectObjects(furnitureGroup.children, true);
+            if (intersects.length > 0) {
+                // Find root furniture group
+                let obj = intersects[0].object;
+                while (obj.parent && obj.parent !== furnitureGroup) {
+                    obj = obj.parent;
+                }
+                if (obj.userData && obj.userData.isFurniture) {
+                    selectFurniture(obj);
+                    isDragging = true;
+                    controls.enabled = false; // Matikan rotasi kamera saat geser barang
+
+                    if (raycaster.ray.intersectPlane(floorPlane, planeIntersect)) {
+                        dragOffset.copy(planeIntersect).sub(selectedObject.position);
+                    }
+                    renderer.domElement.style.cursor = 'grabbing';
+                    return;
+                }
+            } else {
+                // Klik di area kosong -> Deselect
+                selectFurniture(null);
+            }
+        });
+
+        window.addEventListener('pointermove', (e) => {
+            getPointerNormalized(e);
+            raycaster.setFromCamera(pointer, camera);
+
+            if (isDragging && selectedObject) {
+                if (raycaster.ray.intersectPlane(floorPlane, planeIntersect)) {
+                    const targetX = planeIntersect.x - dragOffset.x;
+                    const targetZ = planeIntersect.z - dragOffset.z;
+
+                    // Batasi agar tidak keluar batas ruangan
+                    const halfW = ROOM_W / 2 - 0.4;
+                    const halfD = ROOM_D / 2 - 0.4;
+                    selectedObject.position.x = THREE.MathUtils.clamp(targetX, -halfW, halfW);
+                    selectedObject.position.z = THREE.MathUtils.clamp(targetZ, -halfD, halfD);
+
+                    updateInspectorUI();
+                }
+                return;
+            }
+
+            // Hover cursor feedback
+            const intersects = raycaster.intersectObjects(furnitureGroup.children, true);
+            renderer.domElement.style.cursor = intersects.length > 0 ? 'grab' : 'default';
+        });
+
+        window.addEventListener('pointerup', () => {
+            if (isDragging) {
+                isDragging = false;
+                controls.enabled = true;
+                renderer.domElement.style.cursor = 'grab';
+            }
+        });
+
+        // --- 8. UI BUTTONS & EVENTS ---
+        document.getElementById('btn-deselect').addEventListener('click', () => selectFurniture(null));
+
+        // Rotate Slider
+        rotSlider.addEventListener('input', (e) => {
+            if (!selectedObject) return;
+            const deg = parseFloat(e.target.value);
+            selectedObject.rotation.y = THREE.MathUtils.degToRad(deg);
+            selectedRotEl.textContent = `${deg}°`;
+        });
+
+        // Dock: Rotate 45 deg
+        document.getElementById('dock-rotate').addEventListener('click', () => {
+            if (!selectedObject) {
+                statusText.textContent = 'Pilih salah satu furnitur terlebih dahulu untuk memutar!';
+                return;
+            }
+            selectedObject.rotation.y += Math.PI / 4;
+            updateInspectorUI();
+        });
+
+        // Material Color Swatches
+        const swatches = document.querySelectorAll('.color-swatch');
+        swatches.forEach(swatch => {
+            swatch.addEventListener('click', () => {
+                if (!selectedObject) return;
+                const hex = swatch.getAttribute('data-color');
+                selectedObject.userData.colorMeshes.forEach(mesh => {
+                    mesh.material = mesh.material.clone();
+                    mesh.material.color.set(hex);
+                });
+                swatches.forEach(s => s.classList.remove('selected'));
+                swatch.classList.add('selected');
+            });
+        });
+
+        // Dock: Change Material Quick Cycle
+        const quickColors = ['#9c8f84', '#475569', '#065f46', '#9a3412', '#d6d3d1', '#27272a'];
+        let colorIdx = 0;
+        document.getElementById('dock-material').addEventListener('click', () => {
+            if (!selectedObject) {
+                statusText.textContent = 'Pilih furnitur dulu untuk mengganti warna material!';
+                return;
+            }
+            colorIdx = (colorIdx + 1) % quickColors.length;
+            const hex = quickColors[colorIdx];
+            selectedObject.userData.colorMeshes.forEach(mesh => {
+                mesh.material = mesh.material.clone();
+                mesh.material.color.set(hex);
+            });
+        });
+
+        // Duplicate & Delete Object
+        document.getElementById('btn-delete').addEventListener('click', () => {
+            if (!selectedObject) return;
+            furnitureGroup.remove(selectedObject);
+            selectFurniture(null);
+        });
+
+        document.getElementById('btn-duplicate').addEventListener('click', () => {
+            if (!selectedObject) return;
+            const clone = selectedObject.clone();
+            clone.position.x += 0.4;
+            clone.position.z += 0.4;
+            furnitureGroup.add(clone);
+            selectFurniture(clone);
+        });
+
+        // Modals Toggle (Catalog & Walls/Floor)
+        const catalogModal = document.getElementById('catalog-modal');
+        const roomStyleModal = document.getElementById('room-style-modal');
+
+        document.getElementById('dock-catalog').addEventListener('click', () => {
+            roomStyleModal.classList.add('hidden');
+            catalogModal.classList.toggle('hidden');
+        });
+        document.getElementById('close-catalog').addEventListener('click', () => catalogModal.classList.add('hidden'));
+
+        document.getElementById('dock-walls').addEventListener('click', () => {
+            catalogModal.classList.add('hidden');
+            roomStyleModal.classList.toggle('hidden');
+        });
+        document.getElementById('close-room-style').addEventListener('click', () => roomStyleModal.classList.add('hidden'));
+
+        // Add item from Catalog
+        document.querySelectorAll('.add-item-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const type = btn.getAttribute('data-type');
+                let newObj = null;
+                const randX = (Math.random() - 0.5) * 1.2;
+                const randZ = (Math.random() - 0.5) * 1.2;
+
+                if (type === 'armchair') newObj = createArmchair(randX, randZ, 0);
+                if (type === 'table') newObj = createCoffeeTable(randX, randZ);
+                if (type === 'plant') newObj = createPlant(randX, randZ);
+                if (type === 'lamp') newObj = createFloorLamp(randX, randZ);
+
+                if (newObj) selectFurniture(newObj);
+                catalogModal.classList.add('hidden');
+            });
+        });
+
+        // Floor & Wall Style Switchers
+        document.querySelectorAll('.floor-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const type = btn.getAttribute('data-floor');
+                floorMat.map = woodTextures[type];
+                floorMat.needsUpdate = true;
+            });
+        });
+
+        document.querySelectorAll('.wall-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const hex = btn.getAttribute('data-wall');
+                wallMat.color.set(hex);
+            });
+        });
+
+        // Top Bar Controls: Dimensions, Day/Night, Reset Camera
+        const btnDim = document.getElementById('btn-dimensions');
+        btnDim.addEventListener('click', () => {
+            showDimensions = !showDimensions;
+            btnDim.classList.toggle('active', showDimensions);
+        });
+
+        let isNight = false;
+        document.getElementById('btn-daynight').addEventListener('click', () => {
+            isNight = !isNight;
+            const icon = document.getElementById('icon-daynight');
+            const text = document.getElementById('text-daynight');
+
+            if (isNight) {
+                scene.background.set('#0f172a');
+                ambientLight.intensity = 0.22;
+                sunLight.intensity = 0.35;
+                sunLight.color.set('#818cf8');
+                warmRoomLight.intensity = 2.2;
+                icon.className = 'fa-solid fa-moon text-indigo-400';
+                text.textContent = 'Malam';
+            } else {
+                scene.background.set('#202227');
+                ambientLight.intensity = 0.65;
+                sunLight.intensity = 2.2;
+                sunLight.color.set('#fff5e6');
+                warmRoomLight.intensity = 0.5;
+                icon.className = 'fa-solid fa-sun text-amber-400';
+                text.textContent = 'Siang';
+            }
+        });
+
+        document.getElementById('btn-reset-cam').addEventListener('click', () => {
+            camera.position.set(6.5, 6.2, 7.5);
+            controls.target.set(0, 0.6, 0);
+            controls.update();
+        });
+
+        // Select Sofa initially so user sees the glowing outline like the reference image
+        selectFurniture(sofaObj);
+
+        // --- 9. RESIZE & ANIMATION LOOP ---
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+        function animate() {
+            requestAnimationFrame(animate);
+            controls.update();
+            refreshAllDimensions();
+            renderer.render(scene, camera);
+        }
+
+        animate();
+    </script>
+</body>
+</html>

@@ -1,0 +1,405 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Living Room 3D Floor</title>
+<style>
+  html, body { margin: 0; height: 100%; overflow: hidden; font-family: system-ui, sans-serif; background: #1b1b1f; }
+  canvas { display: block; }
+  #ui {
+    position: fixed; top: 16px; left: 16px; width: 230px; padding: 14px;
+    background: rgba(20,20,24,.78); backdrop-filter: blur(8px); color: #eee;
+    border-radius: 12px; font-size: 13px;
+  }
+  #ui h1 { font-size: 15px; margin: 0 0 10px; }
+  #ui h2 { font-size: 11px; text-transform: uppercase; letter-spacing: .08em; opacity: .6; margin: 14px 0 6px; }
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+  button {
+    background: #34343c; color: #eee; border: 2px solid transparent; border-radius: 8px;
+    padding: 8px 6px; cursor: pointer; font-size: 12px;
+  }
+  button:hover { background: #44444e; }
+  button.active { border-color: #7aa7ff; }
+  label { display: flex; align-items: center; gap: 8px; margin-top: 8px; }
+  input[type=range] { flex: 1; }
+  #hint { position: fixed; bottom: 14px; left: 50%; transform: translateX(-50%); color: #ccc; font-size: 12px;
+          background: rgba(20,20,24,.6); padding: 6px 12px; border-radius: 20px; }
+</style>
+</head>
+<body>
+<div id="ui">
+  <h1>Living Room Floor</h1>
+  <h2>Material</h2>
+  <div class="grid" id="mats"></div>
+  <h2>Tone</h2>
+  <div class="grid" id="tones"></div>
+  <h2>Options</h2>
+  <label>Tile size <input type="range" id="scale" min="0.5" max="2" step="0.1" value="1"></label>
+  <label><input type="checkbox" id="furn" checked> Show furniture</label>
+  <label><input type="checkbox" id="rotate"> Auto-rotate</label>
+</div>
+<div id="hint">Drag to orbit · scroll to zoom · drag furniture to move it · click furniture + R to rotate</div>
+
+<script type="importmap">
+{ "imports": {
+  "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+  "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+} }
+</script>
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+const ROOM_W = 8, ROOM_D = 6, WALL_H = 3;
+
+// ---------- renderer / scene ----------
+const renderer = new THREE.WebGLRenderer({ antialias: true });
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+renderer.setSize(innerWidth, innerHeight);
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+document.body.appendChild(renderer.domElement);
+
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x1b1b1f);
+
+const camera = new THREE.PerspectiveCamera(50, innerWidth / innerHeight, 0.1, 100);
+camera.position.set(7, 6, 9);
+
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.target.set(0, 0.8, 0);
+controls.maxPolarAngle = Math.PI / 2 - 0.02;
+controls.minDistance = 3;
+controls.maxDistance = 20;
+controls.enableDamping = true;
+
+// ---------- lights ----------
+scene.add(new THREE.HemisphereLight(0xffffff, 0x887766, 0.7));
+const sun = new THREE.DirectionalLight(0xfff1dd, 2.2);
+sun.position.set(5, 8, 4);
+sun.castShadow = true;
+sun.shadow.mapSize.set(2048, 2048);
+Object.assign(sun.shadow.camera, { left: -8, right: 8, top: 8, bottom: -8, near: 1, far: 25 });
+sun.shadow.bias = -0.0005;
+scene.add(sun);
+const lamp = new THREE.PointLight(0xffc27a, 12, 8, 2);
+lamp.position.set(-3.2, 1.9, -2);
+scene.add(lamp);
+
+// ---------- procedural floor textures ----------
+const TONES = {
+  wood:   { Light: '#d8b48a', Warm: '#b07a45', Dark: '#5b3a25', Grey: '#9c958c' },
+  tile:   { White: '#e9e9e6', Beige: '#d9c9a8', Grey: '#8d9094', Black: '#2b2b2e' },
+  marble: { White: '#ecebe8', Grey: '#b7b9bd', Green: '#6e8b78', Black: '#34353a' },
+  carpet: { Cream: '#d8cfbd', Blue: '#4d6a8a', Red: '#8a3a3a', Grey: '#7b7b7f' },
+};
+
+function shade(hex, amt) {
+  const c = new THREE.Color(hex);
+  c.offsetHSL(0, 0, amt);
+  return '#' + c.getHexString();
+}
+const rnd = (s => () => (s = (s * 16807) % 2147483647) / 2147483647)(42);
+
+function makeTexture(kind, base) {
+  const S = 1024, c = document.createElement('canvas');
+  c.width = c.height = S;
+  const g = c.getContext('2d');
+  g.fillStyle = base; g.fillRect(0, 0, S, S);
+
+  if (kind === 'wood') {
+    const rows = 8, h = S / rows;
+    for (let r = 0; r < rows; r++) {
+      let x = -rnd() * 400;
+      while (x < S) {
+        const w = 350 + rnd() * 250;
+        g.fillStyle = shade(base, (rnd() - 0.5) * 0.09);
+        g.fillRect(x, r * h, w, h);
+        for (let i = 0; i < 14; i++) {         // grain
+          g.strokeStyle = shade(base, -0.05 - rnd() * 0.05);
+          g.globalAlpha = 0.25;
+          g.beginPath();
+          const y = r * h + rnd() * h;
+          g.moveTo(x, y); g.lineTo(x + w, y + (rnd() - 0.5) * 6);
+          g.stroke();
+        }
+        g.globalAlpha = 1;
+        g.strokeStyle = 'rgba(0,0,0,.55)'; g.lineWidth = 2;
+        g.strokeRect(x, r * h, w, h);
+        x += w;
+      }
+    }
+  } else if (kind === 'tile') {
+    const n = 4, t = S / n;
+    for (let i = 0; i < n; i++) for (let j = 0; j < n; j++) {
+      g.fillStyle = shade(base, (rnd() - 0.5) * 0.05);
+      g.fillRect(i * t, j * t, t, t);
+    }
+    g.strokeStyle = 'rgba(0,0,0,.45)'; g.lineWidth = 6;
+    for (let i = 0; i <= n; i++) {
+      g.beginPath(); g.moveTo(i * t, 0); g.lineTo(i * t, S); g.stroke();
+      g.beginPath(); g.moveTo(0, i * t); g.lineTo(S, i * t); g.stroke();
+    }
+  } else if (kind === 'marble') {
+    const n = 2, t = S / n;
+    for (let v = 0; v < 26; v++) {              // veins
+      g.strokeStyle = shade(base, rnd() > 0.5 ? -0.25 : 0.15);
+      g.globalAlpha = 0.2 + rnd() * 0.3; g.lineWidth = 0.5 + rnd() * 2.5;
+      g.beginPath();
+      let x = rnd() * S, y = 0; g.moveTo(x, y);
+      while (y < S) { x += (rnd() - 0.5) * 70; y += 30 + rnd() * 30; g.lineTo(x, y); }
+      g.stroke();
+    }
+    g.globalAlpha = 1;
+    g.strokeStyle = 'rgba(0,0,0,.25)'; g.lineWidth = 3;
+    for (let i = 0; i <= n; i++) {
+      g.beginPath(); g.moveTo(i * t, 0); g.lineTo(i * t, S); g.stroke();
+      g.beginPath(); g.moveTo(0, i * t); g.lineTo(S, i * t); g.stroke();
+    }
+  } else { // carpet
+    for (let i = 0; i < 90000; i++) {
+      g.fillStyle = shade(base, (rnd() - 0.5) * 0.14);
+      g.fillRect(rnd() * S, rnd() * S, 2, 2);
+    }
+  }
+  const tex = new THREE.CanvasTexture(c);
+  tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
+  tex.colorSpace = THREE.SRGBColorSpace;
+  tex.anisotropy = renderer.capabilities.getMaxAnisotropy();
+  return tex;
+}
+
+const MATERIAL_PROPS = {
+  wood:   { roughness: 0.55, metalness: 0.0, repeat: [3, 2.2] },
+  tile:   { roughness: 0.25, metalness: 0.05, repeat: [2, 1.5] },
+  marble: { roughness: 0.12, metalness: 0.1, repeat: [2, 1.5] },
+  carpet: { roughness: 1.0, metalness: 0.0, repeat: [4, 3] },
+};
+
+// ---------- floor ----------
+const floorMat = new THREE.MeshStandardMaterial();
+const floor = new THREE.Mesh(new THREE.PlaneGeometry(ROOM_W, ROOM_D), floorMat);
+floor.rotation.x = -Math.PI / 2;
+floor.receiveShadow = true;
+scene.add(floor);
+
+const state = { kind: 'wood', tone: 'Warm', scale: 1 };
+
+function applyFloor() {
+  const p = MATERIAL_PROPS[state.kind];
+  floorMat.map?.dispose();
+  floorMat.map = makeTexture(state.kind, TONES[state.kind][state.tone]);
+  floorMat.map.repeat.set(p.repeat[0] / state.scale, p.repeat[1] / state.scale);
+  floorMat.roughness = p.roughness;
+  floorMat.metalness = p.metalness;
+  floorMat.needsUpdate = true;
+}
+
+// ---------- walls (back + left, so the room stays open to view) ----------
+const wallMat = new THREE.MeshStandardMaterial({ color: 0xe8e2d6, roughness: 0.95 });
+const back = new THREE.Mesh(new THREE.BoxGeometry(ROOM_W, WALL_H, 0.15), wallMat);
+back.position.set(0, WALL_H / 2, -ROOM_D / 2 - 0.075);
+const left = new THREE.Mesh(new THREE.BoxGeometry(0.15, WALL_H, ROOM_D), wallMat);
+left.position.set(-ROOM_W / 2 - 0.075, WALL_H / 2, 0);
+[back, left].forEach(w => { w.receiveShadow = true; scene.add(w); });
+
+// baseboards
+const bbMat = new THREE.MeshStandardMaterial({ color: 0xf5f2ea, roughness: 0.6 });
+const bb1 = new THREE.Mesh(new THREE.BoxGeometry(ROOM_W, 0.12, 0.04), bbMat);
+bb1.position.set(0, 0.06, -ROOM_D / 2 + 0.02);
+const bb2 = new THREE.Mesh(new THREE.BoxGeometry(0.04, 0.12, ROOM_D), bbMat);
+bb2.position.set(-ROOM_W / 2 + 0.02, 0.06, 0);
+scene.add(bb1, bb2);
+
+// window on back wall
+const win = new THREE.Mesh(
+  new THREE.PlaneGeometry(2.4, 1.5),
+  new THREE.MeshBasicMaterial({ color: 0xbfe0ff })
+);
+win.position.set(1.5, 1.7, -ROOM_D / 2 + 0.01);
+scene.add(win);
+const frameMat = new THREE.MeshStandardMaterial({ color: 0xffffff });
+for (const [w, h, x, y] of [[2.5,.08,0,.79],[2.5,.08,0,-.79],[.08,1.6,1.24,0],[.08,1.6,-1.24,0],[.05,1.5,0,0]]) {
+  const f = new THREE.Mesh(new THREE.BoxGeometry(w, h, 0.05), frameMat);
+  f.position.set(1.5 + x, 1.7 + y, -ROOM_D / 2 + 0.03);
+  scene.add(f);
+}
+
+// ---------- furniture ----------
+const draggables = [];
+const box = (w, h, d, color, rough = 0.8) => {
+  const m = new THREE.Mesh(new THREE.BoxGeometry(w, h, d),
+    new THREE.MeshStandardMaterial({ color, roughness: rough }));
+  m.castShadow = m.receiveShadow = true;
+  return m;
+};
+function add(group, mesh, x, y, z) { mesh.position.set(x, y, z); group.add(mesh); return mesh; }
+
+function makeSofa() {
+  const g = new THREE.Group(), c = 0x5a6b7d;
+  add(g, box(2.4, 0.35, 1.0, c), 0, 0.3, 0);
+  add(g, box(2.4, 0.55, 0.25, c), 0, 0.75, -0.4);
+  add(g, box(0.25, 0.5, 1.0, c), -1.1, 0.55, 0);
+  add(g, box(0.25, 0.5, 1.0, c), 1.1, 0.55, 0);
+  add(g, box(0.9, 0.18, 0.8, 0x6d8094), -0.45, 0.58, 0.05);
+  add(g, box(0.9, 0.18, 0.8, 0x6d8094), 0.45, 0.58, 0.05);
+  for (const sx of [-1, 1]) for (const sz of [-1, 1])
+    add(g, box(0.08, 0.12, 0.08, 0x2a2a2a), sx * 1.1, 0.06, sz * 0.4);
+  return g;
+}
+function makeTable() {
+  const g = new THREE.Group();
+  add(g, box(1.4, 0.07, 0.8, 0x6b4a2f, 0.4), 0, 0.42, 0);
+  for (const sx of [-1, 1]) for (const sz of [-1, 1])
+    add(g, box(0.07, 0.4, 0.07, 0x3d2a1a), sx * 0.62, 0.2, sz * 0.32);
+  const mug = new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.05, 0.1, 16),
+    new THREE.MeshStandardMaterial({ color: 0xffffff }));
+  mug.position.set(0.3, 0.51, 0.1); mug.castShadow = true; g.add(mug);
+  return g;
+}
+function makeTV() {
+  const g = new THREE.Group();
+  add(g, box(2.0, 0.5, 0.45, 0x2f2a26, 0.5), 0, 0.25, 0);
+  add(g, box(1.5, 0.85, 0.06, 0x0b0b0e, 0.2), 0, 0.95, 0);
+  add(g, box(0.1, 0.45, 0.1, 0x111111), 0, 0.72, 0);
+  return g;
+}
+function makeRug() {
+  const m = new THREE.Mesh(new THREE.BoxGeometry(3.2, 0.02, 2.2),
+    new THREE.MeshStandardMaterial({ color: 0xb85c4a, roughness: 1 }));
+  m.receiveShadow = true;
+  const g = new THREE.Group(); add(g, m, 0, 0.011, 0);
+  return g;
+}
+function makePlant() {
+  const g = new THREE.Group();
+  const pot = new THREE.Mesh(new THREE.CylinderGeometry(0.22, 0.17, 0.4, 20),
+    new THREE.MeshStandardMaterial({ color: 0xc4663a, roughness: 0.8 }));
+  pot.position.y = 0.2; pot.castShadow = true; g.add(pot);
+  const leaf = new THREE.MeshStandardMaterial({ color: 0x3f8a4a, roughness: 0.7 });
+  for (let i = 0; i < 4; i++) {
+    const s = new THREE.Mesh(new THREE.SphereGeometry(0.28 - i * 0.04, 16, 12), leaf);
+    s.position.set(Math.sin(i * 2) * 0.1, 0.65 + i * 0.28, Math.cos(i * 2) * 0.1);
+    s.castShadow = true; g.add(s);
+  }
+  return g;
+}
+function makeLamp() {
+  const g = new THREE.Group();
+  const m = new THREE.MeshStandardMaterial({ color: 0x222222, metalness: 0.6, roughness: 0.4 });
+  const base = new THREE.Mesh(new THREE.CylinderGeometry(0.18, 0.2, 0.04, 20), m); base.position.y = 0.02;
+  const pole = new THREE.Mesh(new THREE.CylinderGeometry(0.025, 0.025, 1.6, 10), m); pole.position.y = 0.8;
+  const shade = new THREE.Mesh(new THREE.CylinderGeometry(0.16, 0.26, 0.3, 24),
+    new THREE.MeshStandardMaterial({ color: 0xffe9bf, emissive: 0xffb860, emissiveIntensity: 0.8 }));
+  shade.position.y = 1.7;
+  g.add(base, pole, shade);
+  return g;
+}
+
+const pieces = [
+  [makeRug(),   0,    0,   0.4, false],
+  [makeSofa(),  0,    0.0, 1.9, true],
+  [makeTable(), 0,    0.0, 0.3, true],
+  [makeTV(),    0,    0.0, -2.65, true],
+  [makePlant(), 3.4,  0.0, -2.5, true],
+  [makeLamp(),  -3.4, 0.0, -2.6, true],
+];
+const furniture = new THREE.Group();
+scene.add(furniture);
+for (const [obj, x, y, z, drag] of pieces) {
+  obj.position.set(x, y, z);
+  if (obj === pieces[1][0]) obj.rotation.y = Math.PI;   // sofa faces the TV
+  furniture.add(obj);
+  if (drag) draggables.push(obj);
+}
+pieces[0][0].userData.rug = true;
+
+// ---------- dragging ----------
+const ray = new THREE.Raycaster();
+const ndc = new THREE.Vector2();
+const plane = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0);
+let dragging = null, selected = null, offset = new THREE.Vector3();
+
+function setNdc(e) {
+  ndc.set((e.clientX / innerWidth) * 2 - 1, -(e.clientY / innerHeight) * 2 + 1);
+  ray.setFromCamera(ndc, camera);
+}
+function rootOf(o) { while (o.parent && !draggables.includes(o)) o = o.parent; return draggables.includes(o) ? o : null; }
+
+renderer.domElement.addEventListener('pointerdown', e => {
+  setNdc(e);
+  const hit = ray.intersectObjects(draggables, true)[0];
+  if (!hit) { selected = null; return; }
+  dragging = selected = rootOf(hit.object);
+  const p = new THREE.Vector3();
+  ray.ray.intersectPlane(plane, p);
+  offset.copy(dragging.position).sub(p);
+  controls.enabled = false;
+  renderer.domElement.style.cursor = 'grabbing';
+});
+renderer.domElement.addEventListener('pointermove', e => {
+  setNdc(e);
+  if (dragging) {
+    const p = new THREE.Vector3();
+    if (ray.ray.intersectPlane(plane, p)) {
+      p.add(offset);
+      dragging.position.x = THREE.MathUtils.clamp(p.x, -ROOM_W / 2 + 0.5, ROOM_W / 2 - 0.5);
+      dragging.position.z = THREE.MathUtils.clamp(p.z, -ROOM_D / 2 + 0.5, ROOM_D / 2 - 0.5);
+    }
+  } else {
+    renderer.domElement.style.cursor = ray.intersectObjects(draggables, true).length ? 'grab' : 'default';
+  }
+});
+addEventListener('pointerup', () => {
+  dragging = null; controls.enabled = true; renderer.domElement.style.cursor = 'default';
+});
+addEventListener('keydown', e => {
+  if (e.key.toLowerCase() === 'r' && selected) selected.rotation.y += Math.PI / 2;
+});
+
+// ---------- UI ----------
+const matsEl = document.getElementById('mats');
+const tonesEl = document.getElementById('tones');
+
+function buildTones() {
+  tonesEl.innerHTML = '';
+  for (const name of Object.keys(TONES[state.kind])) {
+    const b = document.createElement('button');
+    b.textContent = name;
+    b.style.borderLeft = `10px solid ${TONES[state.kind][name]}`;
+    if (name === state.tone) b.classList.add('active');
+    b.onclick = () => { state.tone = name; buildTones(); applyFloor(); };
+    tonesEl.appendChild(b);
+  }
+}
+for (const kind of Object.keys(TONES)) {
+  const b = document.createElement('button');
+  b.textContent = kind[0].toUpperCase() + kind.slice(1);
+  if (kind === state.kind) b.classList.add('active');
+  b.onclick = () => {
+    state.kind = kind;
+    state.tone = Object.keys(TONES[kind])[0];
+    [...matsEl.children].forEach(c => c.classList.toggle('active', c === b));
+    buildTones(); applyFloor();
+  };
+  matsEl.appendChild(b);
+}
+document.getElementById('scale').oninput = e => { state.scale = +e.target.value; applyFloor(); };
+document.getElementById('furn').onchange = e => { furniture.visible = e.target.checked; lamp.visible = e.target.checked; };
+document.getElementById('rotate').onchange = e => { controls.autoRotate = e.target.checked; };
+
+buildTones();
+applyFloor();
+
+// ---------- loop ----------
+addEventListener('resize', () => {
+  camera.aspect = innerWidth / innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(innerWidth, innerHeight);
+});
+renderer.setAnimationLoop(() => { controls.update(); renderer.render(scene, camera); });
+</script>
+</body>
+</html>
